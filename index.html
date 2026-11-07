@@ -6,47 +6,59 @@
   <title>PropTracker - Edwin Josney</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* --- Paleta Oficial de Colores PropTracker --- */
+    /* --- Paleta y Estilos Glassmorphism Avanzado --- */
     :root {
-      --bg-body: #0A0D14;        /* Azul noche profundo */
-      --bg-card: #111622;        /* Superficie de módulos */
-      --bg-input: #182030;       /* Fondo de inputs / filas */
-      --border-color: #1E2638;   /* Línea de separación limpia */
-      --text-main: #FFFFFF;      /* Texto principal */
-      --text-sub: #8A99AD;       /* Texto secundario */
-      --brand-blue: #3563E9;     /* Azul primario PropTracker */
+      --bg-body: #07090E;        /* Azul noche ultra profundo */
+      --bg-card: rgba(17, 22, 34, 0.75); /* Cristal esmerilado oscuro */
+      --bg-input: rgba(24, 32, 48, 0.6);  /* Fondo inputs translúcido */
+      --border-color: rgba(255, 255, 255, 0.07); /* Borde sutil de cristal */
+      --text-main: #FFFFFF;      
+      --text-sub: #8A99AD;       
+      --brand-blue: #3563E9;     
     }
 
     [data-theme="light"] {
-      --bg-body: #F4F6F8;        /* Gris azulado frío suave */
-      --bg-card: #FFFFFF;        /* Blanco puro para tarjetas */
-      --bg-input: #F1F5F9;       /* Fondo claro de inputs */
-      --border-color: #E2E8F0;   /* Bordes claros */
-      --text-main: #0F172A;      /* Slate 900 */
-      --text-sub: #64748B;       /* Slate 500 */
+      --bg-body: #EEF2F6;        
+      --bg-card: rgba(255, 255, 255, 0.85); /* Cristal claro translúcido */
+      --bg-input: rgba(241, 245, 249, 0.8);  
+      --border-color: rgba(0, 0, 0, 0.08);   
+      --text-main: #0F172A;      
+      --text-sub: #64748B;       
       --brand-blue: #3563E9;
     }
 
     body {
       background-color: var(--bg-body);
       color: var(--text-main);
-      transition: background-color 0.25s ease, color 0.25s ease;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      background-image: radial-gradient(circle at 10% 20%, rgba(53, 99, 233, 0.06) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(0, 210, 106, 0.04) 0%, transparent 40%);
+      background-attachment: fixed;
     }
 
     .prop-card {
       background-color: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--border-color);
-      transition: background-color 0.25s ease, border-color 0.25s ease;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      transition: all 0.3s ease;
+    }
+
+    .prop-card:hover {
+      border-color: rgba(53, 99, 233, 0.25);
     }
 
     .prop-input {
       background-color: var(--bg-input);
+      backdrop-filter: blur(8px);
       border: 1px solid var(--border-color);
       color: var(--text-main);
     }
 
     .prop-input:focus {
       border-color: var(--brand-blue);
+      box-shadow: 0 0 10px rgba(53, 99, 233, 0.2);
     }
 
     .text-sub { color: var(--text-sub); }
@@ -78,7 +90,6 @@
       background-color: var(--bg-input);
     }
 
-    /* Ocultar flecha nativa de acordeón en todos los navegadores */
     summary::-webkit-details-marker {
       display: none;
     }
@@ -87,7 +98,6 @@
     }
   </style>
 
-  <!-- Script en Head para prevenir parpadeos en carga inicial -->
   <script>
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
@@ -111,13 +121,13 @@
       </div>
       <div class="flex gap-2 w-full sm:w-auto items-center">
         <!-- Botón Toggle de Tema -->
-        <button id="theme-toggle" class="p-2.5 prop-card rounded-lg hover:opacity-80 transition flex items-center justify-center text-sub h-full" aria-label="Cambiar tema" title="Modo Claro / Oscuro">
+        <button id="theme-toggle" class="p-2.5 prop-card rounded-xl hover:opacity-80 transition flex items-center justify-center text-sub h-full" aria-label="Cambiar tema" title="Modo Claro / Oscuro">
           <span id="theme-icon" class="flex items-center justify-center"></span>
         </button>
-        <button id="btn-exportar" class="flex-1 sm:flex-none text-xs bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 font-semibold px-4 py-2.5 rounded-lg border border-amber-500/30 transition h-full">
+        <button id="btn-exportar" class="flex-1 sm:flex-none text-xs bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 font-semibold px-4 py-2.5 rounded-xl border border-amber-500/30 transition h-full">
            Exportar CSV
         </button>
-        <button id="btn-limpiar" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-500 font-semibold px-3 py-2.5 rounded-lg border border-red-500/30 transition h-full">
+        <button id="btn-limpiar" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-500 font-semibold px-3 py-2.5 rounded-xl border border-red-500/30 transition h-full">
           Reiniciar
         </button>
       </div>
@@ -126,62 +136,97 @@
     <!-- Módulo Filtro de Periodos / Meses -->
     <div class="prop-card p-4 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
       <div class="flex items-center gap-2">
-        <span class="text-base"></span>
         <label for="filtro-periodo" class="text-xs font-bold text-main uppercase tracking-wider">Métricas por Periodo</label>
       </div>
       <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
-        <select id="filtro-periodo" class="prop-input rounded-lg p-2.5 text-xs font-semibold focus:outline-none transition-colors w-full sm:w-auto">
-          <option value="todos"> Todo el Historial</option>
-          <option value="mes_actual" selected> Mes Actual</option>
-          <option value="mes_anterior"> Mes Anterior</option>
-          <option value="ytd"> Año Actual</option>
-          <option value="mes_especifico"> Elegir Mes Específico...</option>
+        <select id="filtro-periodo" class="prop-input rounded-xl p-2.5 text-xs font-semibold focus:outline-none transition-colors w-full sm:w-auto">
+          <option value="todos">🌐 Todo el Historial</option>
+          <option value="mes_actual" selected>📅 Mes Actual</option>
+          <option value="mes_anterior">⏮️ Mes Anterior</option>
+          <option value="ytd">🚀 Año Actual</option>
+          <option value="mes_especifico">📆 Elegir Mes Específico...</option>
         </select>
 
-        <!-- Selector de mes personalizado (Oculto por defecto) -->
-        <input type="month" id="filtro-mes-especifico" class="prop-input rounded-lg p-2 text-xs focus:outline-none hidden w-full sm:w-auto">
+        <input type="month" id="filtro-mes-especifico" class="prop-input rounded-xl p-2 text-xs focus:outline-none hidden w-full sm:w-auto">
       </div>
     </div>
 
-    <!-- Módulo 1: KPIs Principales -->
+    <!-- Módulo 1: KPIs Principales con Glassmorphism -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="prop-card p-5 rounded-2xl space-y-1">
+      <div class="prop-card p-5 rounded-2xl space-y-1 relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 w-20 h-20 bg-red-500/10 rounded-full blur-xl pointer-events-none"></div>
         <span class="text-sub text-xs font-semibold uppercase tracking-wider">Inversión Total</span>
         <div id="kpi-inversion" class="text-3xl font-black text-red-500">$0.00</div>
         <p class="text-[10px] text-sub">Evaluaciones, Resets & Fees</p>
       </div>
 
-      <div class="prop-card p-5 rounded-2xl space-y-1">
+      <div class="prop-card p-5 rounded-2xl space-y-1 relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
         <span class="text-sub text-xs font-semibold uppercase tracking-wider">Payouts Totales</span>
         <div id="kpi-payouts" class="text-3xl font-black text-emerald-400">$0.00</div>
         <p class="text-[10px] text-sub">Cobros Netos Retirados</p>
       </div>
 
-      <div class="prop-card p-5 rounded-2xl space-y-1">
+      <div class="prop-card p-5 rounded-2xl space-y-1 relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 w-20 h-20 bg-blue-500/10 rounded-full blur-xl pointer-events-none"></div>
         <span class="text-sub text-xs font-semibold uppercase tracking-wider">P&L Neto Real</span>
         <div id="kpi-pnl" class="text-3xl font-black text-main">$0.00</div>
         <p class="text-[10px] text-sub">Ganancia / Pérdida Real</p>
       </div>
 
-      <div class="prop-card p-5 rounded-2xl space-y-1">
+      <div class="prop-card p-5 rounded-2xl space-y-1 relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
         <span class="text-sub text-xs font-semibold uppercase tracking-wider">ROI Real</span>
         <div id="kpi-roi" class="text-3xl font-black text-emerald-400">0.0%</div>
         <p class="text-[10px] text-sub">Retorno sobre la Inversión</p>
       </div>
     </div>
 
-    <!-- Módulo 2: Formulario de Registro (Panel Desplegable) -->
+    <!-- Módulo Visual Estilo Tradibook (Glassmorphism Performance Card) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="prop-card p-6 rounded-2xl lg:col-span-2 flex flex-col justify-between space-y-4">
+        <div class="flex justify-between items-center">
+          <div>
+            <span class="text-xs text-sub uppercase font-bold tracking-wider">Rendimiento Operativo</span>
+            <h3 class="text-lg font-bold text-main mt-0.5">Balance y P&L del Periodo</h3>
+          </div>
+          <span class="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20">Activo Fondeado</span>
+        </div>
+        <div class="py-4 flex items-end gap-3">
+          <div id="card-pnl-large" class="text-4xl font-black text-emerald-400">$0.00</div>
+          <div class="text-xs text-sub mb-1.5 font-medium">Margen Neto Global</div>
+        </div>
+        <div class="w-full bg-neutral-800/40 rounded-full h-2 overflow-hidden border border-neutral-700/30">
+          <div id="progress-bar" class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <div class="prop-card p-6 rounded-2xl flex flex-col justify-between space-y-2">
+        <span class="text-xs text-sub uppercase font-bold tracking-wider">Salud Financiera</span>
+        <div>
+          <div class="text-2xl font-bold text-main" id="ratio-eficiencia">0.0x</div>
+          <p class="text-xs text-sub mt-1">Ratio Payout / Inversión en cuentas.</p>
+        </div>
+        <div class="pt-2 border-t" style="border-color: var(--border-color);">
+          <span class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
+            <span>🟢</span> Sincronizado con Firebase Cloud
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Módulo 2: Formulario de Registro (Panel Desplegable Glass) -->
     <details id="panel-formulario" class="prop-card rounded-2xl overflow-hidden group transition-all duration-200">
       <summary class="p-4 sm:p-5 flex items-center justify-between cursor-pointer select-none hover:opacity-90 transition-opacity">
         <div class="flex items-center gap-2">
-          <span class="text-amber-500 font-bold text-base flex items-center gap-2">
+          <span class="text-amber-400 font-bold text-base flex items-center gap-2">
             <span>➕</span> Registrar Nuevo Movimiento / Cuenta
           </span>
         </div>
         <div class="flex items-center gap-2">
           <span class="text-xs text-sub font-medium group-open:hidden">Abrir Formulario</span>
           <span class="text-xs text-sub font-medium hidden group-open:inline">Cerrar Formulario</span>
-          <svg class="w-4 h-4 text-amber-500 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 text-amber-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
           </svg>
         </div>
@@ -191,7 +236,7 @@
         <form id="tracker-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
           <div>
             <label class="text-[11px] text-sub font-medium mb-1 block">Tipo de Movimiento</label>
-            <select id="tipo" class="w-full prop-input rounded-lg p-2.5 text-sm focus:outline-none transition-colors">
+            <select id="tipo" class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
               <option value="gasto">🔴 Gasto / Evaluación / Fee</option>
               <option value="payout">🟢 Payout / Cobro Neto</option>
             </select>
@@ -199,17 +244,17 @@
 
           <div>
             <label class="text-[11px] text-sub font-medium mb-1 block">Fecha del Movimiento</label>
-            <input type="date" id="fecha" required class="w-full prop-input rounded-lg p-2.5 text-sm focus:outline-none transition-colors">
+            <input type="date" id="fecha" required class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
           </div>
 
           <div>
             <label class="text-[11px] text-sub font-medium mb-1 block">Firma de Fondeo</label>
-            <input type="text" id="firma" placeholder="Ej. Lucid Trading" required class="w-full prop-input rounded-lg p-2.5 text-sm focus:outline-none transition-colors">
+            <input type="text" id="firma" placeholder="Ej. Lucid Trading" required class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
           </div>
 
           <div>
             <label class="text-[11px] text-sub font-medium mb-1 block">Plataforma</label>
-            <select id="plataforma" class="w-full prop-input rounded-lg p-2.5 text-sm focus:outline-none transition-colors">
+            <select id="plataforma" class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
               <option value="Tradovate">Tradovate</option>
               <option value="Rithmic">Rithmic</option>
               <option value="NinjaTrader">NinjaTrader</option>
@@ -221,7 +266,7 @@
 
           <div>
             <label class="text-[11px] text-sub font-medium mb-1 block">Tamaño de Cuenta</label>
-            <select id="tamano" class="w-full prop-input rounded-lg p-2.5 text-sm focus:outline-none transition-colors">
+            <select id="tamano" class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
               <option value="50k">$50,000 (50k)</option>
               <option value="25k">$25,000 (25k)</option>
               <option value="100k">$100,000 (100k)</option>
@@ -232,7 +277,7 @@
 
           <div>
             <label class="text-[11px] text-sub font-medium mb-1 block">Estado Actual</label>
-            <select id="estado" class="w-full prop-input rounded-lg p-2.5 text-sm focus:outline-none transition-colors">
+            <select id="estado" class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
               <option value="Evaluación">En Evaluación</option>
               <option value="Fondeada Sim">Fondeada Sim / PA</option>
               <option value="Fondeada Live">Fondeada Live</option>
@@ -243,16 +288,16 @@
 
           <div>
             <label class="text-[11px] text-sub font-medium mb-1 block">Concepto / Detalle</label>
-            <input type="text" id="concepto" placeholder="Ej. Eval 50k Flex / Reset" required class="w-full prop-input rounded-lg p-2.5 text-sm focus:outline-none transition-colors">
+            <input type="text" id="concepto" placeholder="Ej. Eval 50k Flex / Reset" required class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
           </div>
 
           <div>
             <label class="text-[11px] text-sub font-medium mb-1 block">Monto ($ USD)</label>
-            <input type="number" step="0.01" id="monto" placeholder="Ej. 50.30" required class="w-full prop-input rounded-lg p-2.5 text-sm focus:outline-none transition-colors">
+            <input type="number" step="0.01" id="monto" placeholder="Ej. 50.30" required class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
           </div>
 
           <div class="flex items-end lg:col-span-4">
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-lg p-2.5 transition shadow-sm">
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl p-2.5 transition shadow-lg shadow-blue-600/20">
               Guardar Registro
             </button>
           </div>
@@ -263,7 +308,7 @@
     <!-- Módulo 3: Tabla de Historial -->
     <div class="prop-card rounded-2xl overflow-hidden">
       <div class="p-4 flex justify-between items-center border-b" style="border-color: var(--border-color);">
-        <h2 class="text-base font-bold text-amber-500"> Historial de Operaciones</h2>
+        <h2 class="text-base font-bold text-amber-400">📋 Historial de Operaciones</h2>
         <span id="contador-registros" class="text-xs text-sub">Cargando base de datos...</span>
       </div>
       <div class="overflow-x-auto">
@@ -313,7 +358,6 @@
       setThemeUI(targetTheme);
     });
 
-    // Establecer la fecha de hoy por defecto en el formulario
     document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
   </script>
 
@@ -348,7 +392,6 @@
           currentRegistros.push({ keyId: key, ...data[key] });
         });
       } else {
-        // Registro inicial de ejemplo
         push(registrosRef, {
           tipo: 'gasto',
           fecha: new Date().toISOString().split('T')[0],
@@ -366,7 +409,6 @@
       actualizarVista();
     });
 
-    // Guardar nuevo registro
     document.getElementById('tracker-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const tipo = document.getElementById('tipo').value;
@@ -382,7 +424,6 @@
       .then(() => { 
         document.getElementById('tracker-form').reset();
         document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
-        // Opcional: repliega el panel tras guardar exitosamente
         document.getElementById('panel-formulario').removeAttribute('open');
       })
       .catch(err => { alert("Error al conectar con la base de datos: " + err.message); });
@@ -418,7 +459,6 @@
       a.click();
     });
 
-    // Escuchadores del filtro de periodo
     const filtroPeriodoSelect = document.getElementById('filtro-periodo');
     const filtroMesInput = document.getElementById('filtro-mes-especifico');
 
@@ -426,7 +466,7 @@
       if (filtroPeriodoSelect.value === 'mes_especifico') {
         filtroMesInput.classList.remove('hidden');
         if (!filtroMesInput.value) {
-          filtroMesInput.value = new Date().toISOString().slice(0, 7); // YYYY-MM
+          filtroMesInput.value = new Date().toISOString().slice(0, 7);
         }
       } else {
         filtroMesInput.classList.add('hidden');
@@ -436,13 +476,12 @@
 
     filtroMesInput.addEventListener('change', actualizarVista);
 
-    // Función principal para filtrar los registros según el periodo seleccionado
     function obtenerRegistrosFiltrados() {
       const periodo = filtroPeriodoSelect.value;
-      const mesEspecificoVal = filtroMesInput.value; // YYYY-MM
+      const mesEspecificoVal = filtroMesInput.value;
       const ahora = new Date();
       const anioActual = ahora.getFullYear();
-      const mesActual = ahora.getMonth(); // 0 a 11
+      const mesActual = ahora.getMonth();
 
       return currentRegistros.filter(r => {
         let fechaObj;
@@ -461,22 +500,18 @@
         if (periodo === 'mes_actual') {
           return rAnio === anioActual && rMes === mesActual;
         }
-
         if (periodo === 'mes_anterior') {
           const fechaMesAnterior = new Date(anioActual, mesActual - 1, 1);
           return rAnio === fechaMesAnterior.getFullYear() && rMes === fechaMesAnterior.getMonth();
         }
-
         if (periodo === 'ytd') {
           return rAnio === anioActual;
         }
-
         if (periodo === 'mes_especifico' && mesEspecificoVal) {
           const [eAnio, eMes] = mesEspecificoVal.split('-').map(Number);
           return rAnio === eAnio && rMes === (eMes - 1);
         }
-
-        return true; // 'todos'
+        return true;
       });
     }
 
@@ -492,7 +527,6 @@
       let inversionTotal = 0;
       let payoutsTotales = 0;
 
-      // Ordenar por fecha descendente
       registros.sort((a, b) => new Date(b.fecha || b.timestamp) - new Date(a.fecha || a.timestamp));
 
       registros.forEach(r => {
@@ -503,7 +537,7 @@
         if (r.estado === 'Fondeada Sim') estadoColor = "bg-blue-500/10 text-blue-400 border border-blue-500/30";
         if (r.estado === 'Fondeada Live') estadoColor = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
         if (r.estado === 'Quemada') estadoColor = "bg-red-500/10 text-red-400 border border-red-500/30";
-        if (r.estado === 'Evaluación') estadoColor = "bg-amber-500/10 text-amber-500 border border-amber-500/30";
+        if (r.estado === 'Evaluación') estadoColor = "bg-amber-500/10 text-amber-400 border border-amber-500/30";
 
         const tr = document.createElement('tr');
         tr.className = 'prop-table-row';
@@ -535,6 +569,7 @@
 
       const pnl = payoutsTotales - inversionTotal;
       const roi = inversionTotal > 0 ? ((pnl / inversionTotal) * 100).toFixed(1) : '0.0';
+      const ratio = inversionTotal > 0 ? (payoutsTotales / inversionTotal).toFixed(2) : (payoutsTotales > 0 ? '∞' : '0.0');
 
       document.getElementById('kpi-inversion').textContent = `$${inversionTotal.toFixed(2)}`;
       document.getElementById('kpi-payouts').textContent = `$${payoutsTotales.toFixed(2)}`;
@@ -543,9 +578,19 @@
       pnlEl.textContent = `$${pnl.toFixed(2)}`;
       pnlEl.className = `text-3xl font-black ${pnl >= 0 ? 'text-emerald-400' : 'text-red-500'}`;
 
+      const cardPnlLarge = document.getElementById('card-pnl-large');
+      cardPnlLarge.textContent = `$${pnl.toFixed(2)}`;
+      cardPnlLarge.className = `text-4xl font-black ${pnl >= 0 ? 'text-emerald-400' : 'text-red-500'}`;
+
       const roiEl = document.getElementById('kpi-roi');
       roiEl.textContent = `${roi}%`;
       roiEl.className = 'text-3xl font-black text-emerald-400';
+
+      document.getElementById('ratio-eficiencia').textContent = `${ratio}x`;
+
+      const progressBar = document.getElementById('progress-bar');
+      const progressPercent = inversionTotal > 0 ? Math.min(Math.max((payoutsTotales / inversionTotal) * 50, 5), 100) : (payoutsTotales > 0 ? 100 : 0);
+      progressBar.style.width = `${progressPercent}%`;
 
       document.getElementById('contador-registros').textContent = `${registros.length} Registros Mostrados`;
     }
