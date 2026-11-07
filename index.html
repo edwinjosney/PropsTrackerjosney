@@ -6,59 +6,60 @@
   <title>PropTracker - Edwin Josney</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* --- Paleta Tradibook Glassmorphism & Light Mode --- */
+    /* --- Estilos Glassmorphism Avanzado (Modo Oscuro & Modo Claro con Transparencia) --- */
     :root {
       --bg-body: #07090E;        
-      --bg-card: rgba(17, 22, 34, 0.75); 
-      --bg-input: rgba(24, 32, 48, 0.6);  
-      --border-color: rgba(255, 255, 255, 0.07); 
+      --bg-card: rgba(17, 22, 34, 0.65); /* Cristal esmerilado oscuro translúcido */
+      --bg-input: rgba(24, 32, 48, 0.45);  
+      --border-color: rgba(255, 255, 255, 0.08); 
       --text-main: #FFFFFF;      
       --text-sub: #8A99AD;       
       --brand-blue: #3563E9;     
     }
 
-    /* MODO CLARO ESTILO TRADIBOOK */
     [data-theme="light"] {
-      --bg-body: #F4F5F7;        /* Fondo general gris claro limpio tipo Tradibook */
-      --bg-card: #FFFFFF;        /* Tarjetas de contenido en blanco puro */
-      --bg-input: #F8FAFC;       /* Inputs y tablas con contraste claro nítido */
-      --border-color: #E2E8F0;   /* Bordes definidos y limpios */
-      --text-main: #0F172A;      /* Slate muy oscuro para máxima legibilidad */
-      --text-sub: #64748B;       /* Gris secundario estructurado */
-      --brand-blue: #2563EB;     /* Azul institucional */
+      --bg-body: #F1F3F6;        /* Fondo gris claro moderno */
+      --bg-card: rgba(255, 255, 255, 0.75); /* Cristal esmerilado blanco translúcido (Efecto Espejo) */
+      --bg-input: rgba(241, 245, 249, 0.7);  
+      --border-color: rgba(0, 0, 0, 0.08);   /* Borde fino sutil */
+      --text-main: #0F172A;      
+      --text-sub: #64748B;       
+      --brand-blue: #2563EB;
     }
 
     body {
       background-color: var(--bg-body);
       color: var(--text-main);
       transition: background-color 0.3s ease, color 0.3s ease;
-      background-image: radial-gradient(circle at 10% 20%, rgba(53, 99, 233, 0.04) 0%, transparent 40%),
-                        radial-gradient(circle at 90% 80%, rgba(0, 210, 106, 0.03) 0%, transparent 40%);
+      background-image: radial-gradient(circle at 15% 15%, rgba(53, 99, 233, 0.08) 0%, transparent 45%),
+                        radial-gradient(circle at 85% 85%, rgba(0, 210, 106, 0.06) 0%, transparent 45%);
       background-attachment: fixed;
     }
 
     .prop-card {
       background-color: var(--bg-card);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--border-color);
-      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.08);
       transition: all 0.3s ease;
     }
 
     .prop-card:hover {
-      border-color: rgba(53, 99, 233, 0.25);
+      border-color: rgba(53, 99, 233, 0.3);
     }
 
     .prop-input {
       background-color: var(--bg-input);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border: 1px solid var(--border-color);
       color: var(--text-main);
     }
 
     .prop-input:focus {
       border-color: var(--brand-blue);
-      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     }
 
     .text-sub { color: var(--text-sub); }
@@ -151,7 +152,7 @@
       </div>
     </div>
 
-    <!-- Módulo 1: KPIs Principales -->
+    <!-- Módulo 1: KPIs Principales (Glassmorphism) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="prop-card p-5 rounded-2xl space-y-1 relative overflow-hidden shadow-sm">
         <span class="text-sub text-xs font-semibold uppercase tracking-wider">Inversión Total</span>
@@ -178,7 +179,7 @@
       </div>
     </div>
 
-    <!-- Módulo Rendimiento Estilo Tradibook -->
+    <!-- Módulo Rendimiento Estilo Tradibook (Glassmorphism) -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <div class="prop-card p-6 rounded-2xl lg:col-span-2 flex flex-col justify-between space-y-4 shadow-sm">
         <div class="flex justify-between items-center">
@@ -192,7 +193,7 @@
           <div id="card-pnl-large" class="text-4xl font-black text-emerald-600 dark:text-emerald-400">$0.00</div>
           <div class="text-xs text-sub mb-1.5 font-medium">Margen Neto Global</div>
         </div>
-        <div class="w-full bg-slate-200 dark:bg-neutral-800/40 rounded-full h-2 overflow-hidden border border-slate-300 dark:border-neutral-700/30">
+        <div class="w-full bg-slate-200/60 dark:bg-neutral-800/40 rounded-full h-2 overflow-hidden border border-slate-300/50 dark:border-neutral-700/30">
           <div id="progress-bar" class="bg-gradient-to-r from-blue-600 to-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
         </div>
       </div>
@@ -211,7 +212,7 @@
       </div>
     </div>
 
-    <!-- Módulo 2: Formulario de Registro (Panel Desplegable) -->
+    <!-- Módulo 2: Formulario de Registro (Panel Desplegable Glass) -->
     <details id="panel-formulario" class="prop-card rounded-2xl overflow-hidden group transition-all duration-200 shadow-sm">
       <summary class="p-4 sm:p-5 flex items-center justify-between cursor-pointer select-none hover:opacity-90 transition-opacity">
         <div class="flex items-center gap-2">
@@ -293,7 +294,7 @@
           </div>
 
           <div class="flex items-end lg:col-span-4">
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl p-2.5 transition shadow-md shadow-blue-600/20">
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl p-2.5 transition shadow-md shadow-blue-600/25">
               Guardar Registro
             </button>
           </div>
