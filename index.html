@@ -31,8 +31,8 @@
       background-color: var(--bg-body);
       color: var(--text-main);
       transition: background-color 0.3s ease, color 0.3s ease;
-      background-image: radial-gradient(circle at 10% 20%, rgba(53, 99, 233, 0.06) 0%, transparent 40%),
-                        radial-gradient(circle at 90% 80%, rgba(0, 210, 106, 0.04) 0%, transparent 40%);
+      background-image: radial-gradient(circle at 10% 20%, rgba(53, 99, 233, 0.06) 0%, transparent 50%),
+                        radial-gradient(circle at 90% 80%, rgba(0, 210, 106, 0.04) 0%, transparent 50%);
       background-attachment: fixed;
     }
 
@@ -140,11 +140,11 @@
       </div>
       <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
         <select id="filtro-periodo" class="prop-input rounded-xl p-2.5 text-xs font-semibold focus:outline-none transition-colors w-full sm:w-auto">
-          <option value="todos">🌐 Todo el Historial</option>
-          <option value="mes_actual" selected>📅 Mes Actual</option>
-          <option value="mes_anterior">⏮️ Mes Anterior</option>
-          <option value="ytd">🚀 Año Actual</option>
-          <option value="mes_especifico">📆 Elegir Mes Específico...</option>
+          <option value="todos"> Todo el Historial</option>
+          <option value="mes_actual" selected> Mes Actual</option>
+          <option value="mes_anterior"> Mes Anterior</option>
+          <option value="ytd"> Año Actual</option>
+          <option value="mes_especifico"> Elegir Mes Específico...</option>
         </select>
 
         <input type="month" id="filtro-mes-especifico" class="prop-input rounded-xl p-2 text-xs focus:outline-none hidden w-full sm:w-auto">
@@ -209,7 +209,7 @@
         </div>
         <div class="pt-2 border-t" style="border-color: var(--border-color);">
           <span class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
-            <span>🟢</span> Sincronizado con Firebase Cloud
+            <span></span> 
           </span>
         </div>
       </div>
