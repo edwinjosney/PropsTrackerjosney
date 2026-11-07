@@ -117,7 +117,7 @@
           </span>
         </div>
         <p class="text-sub text-xs md:text-sm mt-1">
-          Centro Privado de Control Financiero • <span id="status-sync" class="text-emerald-500 dark:text-emerald-400 font-semibold">⚡ Sincronizado en Tiempo Real</span>
+          Centro Privado de Control Financiero • <span id="status-sync" class="text-emerald-500 dark:text-emerald-400 font-semibold"></span>
         </p>
       </div>
       <div class="flex gap-2 w-full sm:w-auto items-center">
@@ -141,11 +141,11 @@
       </div>
       <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
         <select id="filtro-periodo" class="prop-input rounded-xl p-2.5 text-xs font-semibold focus:outline-none transition-colors w-full sm:w-auto">
-          <option value="todos">🌐 Todo el Historial</option>
-          <option value="mes_actual" selected>📅 Mes Actual</option>
-          <option value="mes_anterior">⏮️ Mes Anterior</option>
-          <option value="ytd">🚀 Año Actual</option>
-          <option value="mes_especifico">📆 Elegir Mes Específico...</option>
+          <option value="todos">Todo el Historial</option>
+          <option value="mes_actual" selected>Mes Actual</option>
+          <option value="mes_anterior">Mes Anterior</option>
+          <option value="ytd">Año Actual</option>
+          <option value="mes_especifico">Elegir Mes Específico...</option>
         </select>
 
         <input type="month" id="filtro-mes-especifico" class="prop-input rounded-xl p-2 text-xs focus:outline-none hidden w-full sm:w-auto">
@@ -206,7 +206,7 @@
         </div>
         <div class="pt-2 border-t" style="border-color: var(--border-color);">
           <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-            <span>🟢</span> Sincronizado con Firebase Cloud
+            <span></span> Sincronizado
           </span>
         </div>
       </div>
