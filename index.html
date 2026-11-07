@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PropTracker - Edwin Josney</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* --- Paleta Oficial de Colores PropTracker --- */
+    :root {
+      --bg-body: #0A0D14;        /* Azul noche profundo */
+      --bg-card: #111622;        /* Superficie de módulos */
+      --bg-input: #182030;       /* Fondo de inputs / filas */
+      --border-color: #1E2638;   /* Línea de separación limpia */
+      --text-main: #FFFFFF;      /* Texto principal */
+      --text-sub: #8A99AD;       /* Texto secundario */
+      --brand-blue: #3563E9;     /* Azul primario PropTracker */
+    }
+
+    [data-theme="light"] {
+      --bg-body: #F4F6F8;        /* Gris azulado frío suave */
+      --bg-card: #FFFFFF;        /* Blanco puro para tarjetas */
+      --bg-input: #F1F5F9;       /* Fondo claro de inputs */
+      --border-color: #E2E8F0;   /* Bordes claros */
+      --text-main: #0F172A;      /* Slate 900 */
+      --text-sub: #64748B;       /* Slate 500 */
+      --brand-blue: #3563E9;
+    }
+
+    body {
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .prop-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .prop-input {
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .prop-input:focus {
+      border-color: var(--brand-blue);
+    }
+
+    .text-sub { color: var(--text-sub); }
+    .text-main { color: var(--text-main); }
+
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #FFE259 0%, #FFA751 50%, #FFD700 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    [data-theme="light"] .gold-gradient-text {
+      background: linear-gradient(135deg, #D97706 0%, #B45309 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .prop-table-head {
+      background-color: var(--bg-input);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .prop-table-row {
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.15s ease;
+    }
+
+    .prop-table-row:hover {
+      background-color: var(--bg-input);
+    }
+
+    /* Ocultar flecha nativa de acordeón en todos los navegadores */
+    summary::-webkit-details-marker {
+      display: none;
+    }
+    summary {
+      list-style: none;
+    }
+  </style>
+
+  <!-- Script en Head para prevenir parpadeos en carga inicial -->
+  <script>
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+</head>
+<body class="min-h-screen p-4 md:p-8 font-sans">
+  <div class="max-w-6xl mx-auto space-y-6">
+    
+    <!-- Encabezado Principal -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-5 gap-4" style="border-color: var(--border-color);">
+      <div>
+        <div class="flex items-center gap-3">
+          <h1 class="text-3xl font-extrabold tracking-wide gold-gradient-text">PROPTRACKER</h1>
+          <span class="text-xs font-bold px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/30 tracking-wider uppercase">
+            Edwin Josney
+          </span>
+        </div>
+        <p class="text-sub text-xs md:text-sm mt-1">
+          Centro Privado de Control Financiero • <span id="status-sync" class="text-emerald-400 font-semibold">⚡ Sincronizado en Tiempo Real</span>
+        </p>
+      </div>
+      <div class="flex gap-2 w-full sm:w-auto items-center">
+        <!-- Botón Toggle de Tema -->
+        <button id="theme-toggle" class="p-2.5 prop-card rounded-lg hover:opacity-80 transition flex items-center justify-center text-sub h-full" aria-label="Cambiar tema" title="Modo Claro / Oscuro">
+          <span id="theme-icon" class="flex items-center justify-center"></span>
+        </button>
+        <button id="btn-exportar" class="flex-1 sm:flex-none text-xs bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 font-semibold px-4 py-2.5 rounded-lg border border-amber-500/30 transition h-full">
+           Exportar CSV
+        </button>
+        <button id="btn-limpiar" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-500 font-semibold px-3 py-2.5 rounded-lg border border-red-500/30 transition h-full">
+          Reiniciar
+        </button>
+      </div>
+    </div>
+
+    <!-- Módulo Filtro de Periodos / Meses -->
+    <div class="prop-card p-4 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="text-base"></span>
+        <label for="filtro-periodo" class="text-xs font-bold text-main uppercase tracking-wider">Métricas por Periodo</label>
+      </div>
+      <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
+        <select id="filtro-periodo" class="prop-input rounded-lg p-2.5 text-xs font-semibold focus:outline-none transition-colors w-full sm:w-auto">
+          <option value="todos"> Todo el Historial</option>
+          <option value="mes_actual" selected> Mes Actual</option>
+          <option value="mes_anterior"> Mes Anterior</option>
+          <option value="ytd"> Año Actual</option>
+          <option value="mes_especifico"> Elegir Mes Específico...</option>
+        </select>
+
+        <!-- Selector de mes personalizado (Oculto por defecto) -->
+        <input type="month" id="filtro-mes-especifico" class="prop-input rounded-lg p-2 text-xs focus:outline-none hidden w-full sm:w-auto">
+      </div>
+    </div>
+
+    <!-- Módulo 1: KPIs Principales -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="prop-card p-5 rounded-2xl space-y-1">
+        <span class="text-sub text-xs font-semibold uppercase tracking-wider">Inversión Total</span>
+        <div id="kpi-inversion" class="text-3xl font-black text-red-500">$0.00</div>
+        <p class="text-[10px] text-sub">Evaluaciones, Resets & Fees</p>
+      </div>
+
+      <div class="prop-card p-5 rounded-2xl space-y-1">
+        <span class="text-sub text-xs font-semibold uppercase tracking-wider">Payouts Totales</span>
+        <div id="kpi-payouts" class="text-3xl font-black text-emerald-400">$0.00</div>
+        <p class="text-[10px] text-sub">Cobros Netos Retirados</p>
+      </div>
+
+      <div class="prop-card p-5 rounded-2xl space-y-1">
+        <span class="text-sub text-xs font-semibold uppercase tracking-wider">P&L Neto Real</span>
+        <div id="kpi-pnl" class="text-3xl font-black text-main">$0.00</div>
+        <p class="text-[10px] text-sub">Ganancia / Pérdida Real</p>
+      </div>
+
+      <div class="prop-card p-5 rounded-2xl space-y-1">
+        <span class="text-sub text-xs font-semibold uppercase tracking-wider">ROI Real</span>
+        <div id="kpi-roi" class="text-3xl font-black text-emerald-400">0.0%</div>
+        <p class="text-[10px] text-sub">Retorno sobre la Inversión</p>
+      </div>
+    </div>
+
+    <!-- Módulo 2: Formulario de Registro (Panel Desplegable) -->
+    <details id="panel-formulario" class="prop-card rounded-2xl overflow-hidden group transition-all duration-200">
+      <summary class="p-4 sm:p-5 flex items-center justify-between cursor-pointer select-none hover:opacity-90 transition-opacity">
+        <div class="flex items-center gap-2">
+          <span class="text-amber-500 font-bold text-base flex items-center gap-2">
+            <span>➕</span> Registrar Nuevo Movimiento / Cuenta
+          </span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-sub font-medium group-open:hidden">Abrir Formulario</span>
+          <span class="text-xs text-sub font-medium hidden group-open:inline">Cerrar Formulario</span>
+          <svg class="w-4 h-4 text-amber-500 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+      </summary>
+
+      <div class="p-6 pt-2 border-t" style="border-color: var(--border-color);">
+        <form id="tracker-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
+          <div>
+            <label class="text-[11px] text-sub font-medium mb-1 block">Tipo de Movimiento</label>
+            <select id="tipo" class="w-full prop-input rounded-lg p-2.5 text-sm focus:outline-none transition-colors">
+              <option value="gasto">🔴 Gasto / Evaluación / Fee</option>
+              <option value="payout">🟢 Payout / Cobro Neto</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-[11px] text-sub font-medium mb-1 block">Fecha del Movimiento</label>
+            <input type="date" id="fecha" required class="w-full prop-input rounded-lg p-2.5 text-sm focus:outline-none transition-colors">
+          </div>
+
+          <div>
+            <label class="text-[11px] text-sub font-medium mb-1 block">Firma de Fondeo</label>
+            <input type="text" id="firma" placeholder="Ej. Lucid Trading" required class="w-full prop-input rounded-lg p-2.5 text-sm focus:outline-none transition-colors">
+          </div>
+
+          <div>
+            <label class="text-[11px] text-sub font-medium mb-1 block">Plataforma</label>
+            <select id="plataforma" class="w-full prop-input rounded-lg p-2.5 text-sm focus:outline-none transition-colors">
+              <option value="Tradovate">Tradovate</option>
+              <option value="Rithmic">Rithmic</option>
+              <option value="NinjaTrader">NinjaTrader</option>
+              <option value="DXFeed">DXFeed</option>
+              <option value="MatchTrader">MatchTrader</option>
+              <option value="Otra">Otra</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-[11px] text-sub font-medium mb-1 block">Tamaño de Cuenta</label>
+            <select id="tamano" class="w-full prop-input rounded-lg p-2.5 text-sm focus:outline-none transition-colors">
+              <option value="50k">$50,000 (50k)</option>
+              <option value="25k">$25,000 (25k)</option>
+              <option value="100k">$100,000 (100k)</option>
+              <option value="150k">$150,000 (150k)</option>
+              <option value="N/A">N/A (Otro / Payout)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-[11px] text-sub font-medium mb-1 block">Estado Actual</label>
+            <select id="estado" class="w-full prop-input rounded-lg p-2.5 text-sm focus:outline-none transition-colors">
+              <option value="Evaluación">En Evaluación</option>
+              <option value="Fondeada Sim">Fondeada Sim / PA</option>
+              <option value="Fondeada Live">Fondeada Live</option>
+              <option value="Quemada">Quemada / Suspendida</option>
+              <option value="Cobrado">Payout Completado</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-[11px] text-sub font-medium mb-1 block">Concepto / Detalle</label>
+            <input type="text" id="concepto" placeholder="Ej. Eval 50k Flex / Reset" required class="w-full prop-input rounded-lg p-2.5 text-sm focus:outline-none transition-colors">
+          </div>
+
+          <div>
+            <label class="text-[11px] text-sub font-medium mb-1 block">Monto ($ USD)</label>
+            <input type="number" step="0.01" id="monto" placeholder="Ej. 50.30" required class="w-full prop-input rounded-lg p-2.5 text-sm focus:outline-none transition-colors">
+          </div>
+
+          <div class="flex items-end lg:col-span-4">
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-lg p-2.5 transition shadow-sm">
+              Guardar Registro
+            </button>
+          </div>
+        </form>
+      </div>
+    </details>
+
+    <!-- Módulo 3: Tabla de Historial -->
+    <div class="prop-card rounded-2xl overflow-hidden">
+      <div class="p-4 flex justify-between items-center border-b" style="border-color: var(--border-color);">
+        <h2 class="text-base font-bold text-amber-500"> Historial de Operaciones</h2>
+        <span id="contador-registros" class="text-xs text-sub">Cargando base de datos...</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-main">
+          <thead class="prop-table-head text-sub uppercase text-[11px] font-bold tracking-wider">
+            <tr>
+              <th class="p-3.5">Fecha</th>
+              <th class="p-3.5">Tipo</th>
+              <th class="p-3.5">Firma</th>
+              <th class="p-3.5">Plataforma</th>
+              <th class="p-3.5">Tamaño</th>
+              <th class="p-3.5">Estado</th>
+              <th class="p-3.5">Concepto</th>
+              <th class="p-3.5 text-right">Monto</th>
+              <th class="p-3.5 text-center">Borrar</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-registros">
+            <!-- Filas dinámicas -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Gestión del Toggle de Tema -->
+  <script>
+    const sunSVG = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+    const moonSVG = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+
+    function setThemeUI(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      const iconContainer = document.getElementById('theme-icon');
+      if (iconContainer) {
+        iconContainer.innerHTML = theme === 'dark' ? sunSVG : moonSVG;
+      }
+    }
+
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    setThemeUI(currentTheme);
+
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      const activeTheme = document.documentElement.getAttribute('data-theme');
+      const targetTheme = activeTheme === 'light' ? 'dark' : 'light';
+      localStorage.setItem('theme', targetTheme);
+      setThemeUI(targetTheme);
+    });
+
+    // Establecer la fecha de hoy por defecto en el formulario
+    document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+  </script>
+
+  <!-- Firebase JavaScript SDKs & Lógica de Filtrado -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue, push, remove, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBgudUrsg-8whbcv0JnZgkVSh5cnihaQ9g",
+      authDomain: "proptracker-f3b2f.firebaseapp.com",
+      databaseURL: "https://proptracker-f3b2f-default-rtdb.firebaseio.com",
+      projectId: "proptracker-f3b2f",
+      storageBucket: "proptracker-f3b2f.firebasestorage.app",
+      messagingSenderId: "160227802905",
+      appId: "1:160227802905:web:a378fc56d0b78d7d754f88",
+      measurementId: "G-ZHWMSMCQF0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const registrosRef = ref(db, 'registros');
+
+    let currentRegistros = [];
+
+    onValue(registrosRef, (snapshot) => {
+      const data = snapshot.val();
+      currentRegistros = [];
+      
+      if (data) {
+        Object.keys(data).forEach(key => {
+          currentRegistros.push({ keyId: key, ...data[key] });
+        });
+      } else {
+        // Registro inicial de ejemplo
+        push(registrosRef, {
+          tipo: 'gasto',
+          fecha: new Date().toISOString().split('T')[0],
+          firma: 'Lucid Trading',
+          plataforma: 'Tradovate',
+          tamano: '50k',
+          estado: 'Evaluación',
+          concepto: 'Evaluaciones Acumuladas (9 Cuentas)',
+          monto: 529.30,
+          timestamp: Date.now()
+        });
+        return;
+      }
+
+      actualizarVista();
+    });
+
+    // Guardar nuevo registro
+    document.getElementById('tracker-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const tipo = document.getElementById('tipo').value;
+      const fecha = document.getElementById('fecha').value;
+      const firma = document.getElementById('firma').value;
+      const plataforma = document.getElementById('plataforma').value;
+      const tamano = document.getElementById('tamano').value;
+      const estado = document.getElementById('estado').value;
+      const concepto = document.getElementById('concepto').value;
+      const monto = parseFloat(document.getElementById('monto').value);
+
+      push(registrosRef, { tipo, fecha, firma, plataforma, tamano, estado, concepto, monto, timestamp: Date.now() })
+      .then(() => { 
+        document.getElementById('tracker-form').reset();
+        document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+        // Opcional: repliega el panel tras guardar exitosamente
+        document.getElementById('panel-formulario').removeAttribute('open');
+      })
+      .catch(err => { alert("Error al conectar con la base de datos: " + err.message); });
+    });
+
+    window.eliminarRegistro = function(keyId) {
+      if (confirm("¿Deseas borrar este registro de la nube?")) {
+        remove(ref(db, 'registros/' + keyId));
+      }
+    };
+
+    document.getElementById('btn-limpiar').addEventListener('click', () => {
+      if (confirm('¿Quieres borrar absolutamente todos los registros guardados en la nube?')) {
+        set(registrosRef, null);
+      }
+    });
+
+    document.getElementById('btn-exportar').addEventListener('click', () => {
+      const filtrados = obtenerRegistrosFiltrados();
+      if (filtrados.length === 0) {
+        alert("No hay registros en el periodo seleccionado para exportar.");
+        return;
+      }
+      let csv = "Fecha,Tipo,Firma,Plataforma,Tamaño,Estado,Concepto,Monto_USD\n";
+      filtrados.forEach(r => {
+        csv += `"${r.fecha || '-'}","${r.tipo}","${r.firma}","${r.plataforma}","${r.tamano}","${r.estado}","${r.concepto}","${r.monto}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `PropTracker_EdwinJosney_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+    });
+
+    // Escuchadores del filtro de periodo
+    const filtroPeriodoSelect = document.getElementById('filtro-periodo');
+    const filtroMesInput = document.getElementById('filtro-mes-especifico');
+
+    filtroPeriodoSelect.addEventListener('change', () => {
+      if (filtroPeriodoSelect.value === 'mes_especifico') {
+        filtroMesInput.classList.remove('hidden');
+        if (!filtroMesInput.value) {
+          filtroMesInput.value = new Date().toISOString().slice(0, 7); // YYYY-MM
+        }
+      } else {
+        filtroMesInput.classList.add('hidden');
+      }
+      actualizarVista();
+    });
+
+    filtroMesInput.addEventListener('change', actualizarVista);
+
+    // Función principal para filtrar los registros según el periodo seleccionado
+    function obtenerRegistrosFiltrados() {
+      const periodo = filtroPeriodoSelect.value;
+      const mesEspecificoVal = filtroMesInput.value; // YYYY-MM
+      const ahora = new Date();
+      const anioActual = ahora.getFullYear();
+      const mesActual = ahora.getMonth(); // 0 a 11
+
+      return currentRegistros.filter(r => {
+        let fechaObj;
+        if (r.fecha) {
+          const [yyyy, mm, dd] = r.fecha.split('-').map(Number);
+          fechaObj = new Date(yyyy, mm - 1, dd || 1);
+        } else if (r.timestamp) {
+          fechaObj = new Date(r.timestamp);
+        } else {
+          return true;
+        }
+
+        const rAnio = fechaObj.getFullYear();
+        const rMes = fechaObj.getMonth();
+
+        if (periodo === 'mes_actual') {
+          return rAnio === anioActual && rMes === mesActual;
+        }
+
+        if (periodo === 'mes_anterior') {
+          const fechaMesAnterior = new Date(anioActual, mesActual - 1, 1);
+          return rAnio === fechaMesAnterior.getFullYear() && rMes === fechaMesAnterior.getMonth();
+        }
+
+        if (periodo === 'ytd') {
+          return rAnio === anioActual;
+        }
+
+        if (periodo === 'mes_especifico' && mesEspecificoVal) {
+          const [eAnio, eMes] = mesEspecificoVal.split('-').map(Number);
+          return rAnio === eAnio && rMes === (eMes - 1);
+        }
+
+        return true; // 'todos'
+      });
+    }
+
+    function actualizarVista() {
+      const registrosFiltrados = obtenerRegistrosFiltrados();
+      render(registrosFiltrados);
+    }
+
+    function render(registros) {
+      const tabla = document.getElementById('tabla-registros');
+      tabla.innerHTML = '';
+
+      let inversionTotal = 0;
+      let payoutsTotales = 0;
+
+      // Ordenar por fecha descendente
+      registros.sort((a, b) => new Date(b.fecha || b.timestamp) - new Date(a.fecha || a.timestamp));
+
+      registros.forEach(r => {
+        if (r.tipo === 'gasto') inversionTotal += r.monto;
+        if (r.tipo === 'payout') payoutsTotales += r.monto;
+
+        let estadoColor = "bg-neutral-500/10 text-sub border border-neutral-500/20";
+        if (r.estado === 'Fondeada Sim') estadoColor = "bg-blue-500/10 text-blue-400 border border-blue-500/30";
+        if (r.estado === 'Fondeada Live') estadoColor = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
+        if (r.estado === 'Quemada') estadoColor = "bg-red-500/10 text-red-400 border border-red-500/30";
+        if (r.estado === 'Evaluación') estadoColor = "bg-amber-500/10 text-amber-500 border border-amber-500/30";
+
+        const tr = document.createElement('tr');
+        tr.className = 'prop-table-row';
+        tr.innerHTML = `
+          <td class="p-3.5 text-xs text-sub font-mono">${r.fecha || 'S/F'}</td>
+          <td class="p-3.5">
+            <span class="px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase ${r.tipo === 'gasto' ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'}">
+              ${r.tipo === 'gasto' ? 'GASTO' : 'PAYOUT'}
+            </span>
+          </td>
+          <td class="p-3.5 font-semibold text-main">${r.firma}</td>
+          <td class="p-3.5 text-sub">${r.plataforma || '-'}</td>
+          <td class="p-3.5 text-sub">${r.tamano || '-'}</td>
+          <td class="p-3.5">
+            <span class="px-2 py-0.5 rounded text-[11px] font-medium ${estadoColor}">
+              ${r.estado || 'N/A'}
+            </span>
+          </td>
+          <td class="p-3.5 text-main">${r.concepto}</td>
+          <td class="p-3.5 text-right font-mono font-bold ${r.tipo === 'gasto' ? 'text-red-500' : 'text-emerald-400'}">
+            ${r.tipo === 'gasto' ? '-' : '+'}$${r.monto.toFixed(2)}
+          </td>
+          <td class="p-3.5 text-center">
+            <button onclick="eliminarRegistro('${r.keyId}')" class="text-sub hover:text-red-400 text-sm transition">✕</button>
+          </td>
+        `;
+        tabla.appendChild(tr);
+      });
+
+      const pnl = payoutsTotales - inversionTotal;
+      const roi = inversionTotal > 0 ? ((pnl / inversionTotal) * 100).toFixed(1) : '0.0';
+
+      document.getElementById('kpi-inversion').textContent = `$${inversionTotal.toFixed(2)}`;
+      document.getElementById('kpi-payouts').textContent = `$${payoutsTotales.toFixed(2)}`;
+      
+      const pnlEl = document.getElementById('kpi-pnl');
+      pnlEl.textContent = `$${pnl.toFixed(2)}`;
+      pnlEl.className = `text-3xl font-black ${pnl >= 0 ? 'text-emerald-400' : 'text-red-500'}`;
+
+      const roiEl = document.getElementById('kpi-roi');
+      roiEl.textContent = `${roi}%`;
+      roiEl.className = 'text-3xl font-black text-emerald-400';
+
+      document.getElementById('contador-registros').textContent = `${registros.length} Registros Mostrados`;
+    }
+  </script>
+</body>
+</html>
