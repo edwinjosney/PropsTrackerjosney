@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PropTracker & Pro Journal - Edwin Josney</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Librería para generar capturas de imagen para la comunidad -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
     :root {
       --bg-body: #121620;        
@@ -109,7 +111,7 @@
       <form id="form-auth" class="space-y-4">
         <div>
           <label class="text-[11px] text-sub font-medium mb-1 block">Usuario o Código de Alumno</label>
-          <input type="text" id="auth-user" placeholder="Ej. edwin" required class="w-full prop-input rounded-xl p-3 text-sm focus:outline-none">
+          <input type="text" id="auth-user" placeholder="Ej: edwin" required class="w-full prop-input rounded-xl p-3 text-sm focus:outline-none">
         </div>
         <div>
           <label class="text-[11px] text-sub font-medium mb-1 block">Contraseña de Acceso</label>
@@ -131,7 +133,7 @@
         <div class="flex items-center gap-3">
           <h1 class="text-3xl font-extrabold tracking-wide text-main">PROPTRACKER</h1>
           <span class="text-xs font-bold px-3 py-1 rounded-full bg-slate-700/50 text-white border border-slate-600/50 tracking-wider uppercase shadow-sm">
-            @Edwinjosney
+            @edwinjosney
           </span>
         </div>
         <p class="text-sub text-xs md:text-sm mt-1">
@@ -152,6 +154,9 @@
         <button id="btn-exportar" class="text-xs bg-slate-700/40 hover:bg-slate-700/60 text-white font-semibold px-4 py-2.5 rounded-xl border border-slate-600/40 transition shadow-sm">
           Exportar CSV
         </button>
+        <button id="btn-compartir-img" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-1.5">
+          📸 Compartir Tarjeta
+        </button>
         <button id="btn-limpiar" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold px-3 py-2.5 rounded-xl border border-red-500/30 transition shadow-sm">
           Reiniciar
         </button>
@@ -164,7 +169,7 @@
         📊 Finanzas & Cuentas de Fondeo
       </button>
       <button onclick="cambiarVistaPrincipal('journal')" id="btn-vista-journal" class="flex-1 py-3 text-xs font-bold rounded-xl text-sub hover:text-main transition shadow-sm">
-        📝 Pro Journal de Trades (Futuros)
+        📝 Journal de Trades (Futuros)
       </button>
     </div>
 
@@ -364,9 +369,26 @@
     </div>
 
 
-    <!-- ================= VISTA 2: JOURNAL DE TRADING (MODERNO + GRÁFICA PROFIT FACTOR) ================= -->
+    <!-- ================= VISTA 2: JOURNAL DE TRADING (MODERNO + FILTRO CALENDARIO + TOOLTIP + COMPARTIR) ================= -->
     <div id="vista-journal" class="space-y-6 hidden">
       
+      <!-- Filtro por Mes / Calendario para el Journal -->
+      <div class="prop-card p-4 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <label for="j-filtro-periodo" class="text-xs font-bold text-main uppercase tracking-wider">📅 Filtrar Bitácora por Periodo</label>
+        </div>
+        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
+          <select id="j-filtro-periodo" class="prop-input rounded-xl p-2.5 text-xs font-semibold focus:outline-none transition-colors w-full sm:w-auto">
+            <option value="todos">Todo el Historial</option>
+            <option value="mes_actual" selected>Mes Actual</option>
+            <option value="mes_anterior">Mes Anterior</option>
+            <option value="ytd">Año Actual</option>
+            <option value="mes_especifico">Elegir Mes Específico (Nov, Dic, Ene...)</option>
+          </select>
+          <input type="month" id="j-filtro-mes-especifico" class="prop-input rounded-xl p-2 text-xs focus:outline-none hidden w-full sm:w-auto">
+        </div>
+      </div>
+
       <!-- KPIs Superiores de Performance -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="prop-card p-5 rounded-2xl space-y-1 shadow-sm">
@@ -376,9 +398,9 @@
         </div>
 
         <div class="prop-card p-5 rounded-2xl space-y-1 shadow-sm">
-          <span class="text-sub text-xs font-semibold uppercase tracking-wider">P&L Total del Journal</span>
+          <span class="text-sub text-xs font-semibold uppercase tracking-wider">P&L Total del Periodo</span>
           <div id="journal-pnl" class="text-3xl font-black text-main">$0.00</div>
-          <p class="text-[10px] text-sub">Suma neta de contratos</p>
+          <p class="text-[10px] text-sub">Suma neta filtrada</p>
         </div>
 
         <div class="prop-card p-5 rounded-2xl space-y-1 shadow-sm">
@@ -394,22 +416,26 @@
         </div>
       </div>
 
-      <!-- Gráfica de Crecimiento y Rendimiento -->
-      <div class="prop-card p-6 rounded-2xl space-y-4 shadow-sm">
+      <!-- Tarjeta Capturable para la Comunidad / Gráfica -->
+      <div id="tarjeta-capturable" class="prop-card p-6 rounded-2xl space-y-4 shadow-sm">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
             <span class="text-xs text-sub uppercase font-bold tracking-wider">Curva de Crecimiento & Profit Factor</span>
-            <h3 class="text-lg font-bold text-main mt-0.5">Evolución del P&L en el Tiempo</h3>
+            <h3 class="text-lg font-bold text-main mt-0.5">Evolución del P&L en el Tiempo (<span id="label-periodo-activo">Mes Actual</span>)</h3>
           </div>
           <span id="badge-pf-estado" class="px-3 py-1 rounded-lg bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/20">Sin datos suficientes</span>
         </div>
-        <!-- Contenedor Visual de la Gráfica de Crecimiento -->
-        <div class="w-full h-48 prop-input rounded-xl p-4 flex flex-col justify-end relative overflow-hidden border border-white/5">
-          <div id="grafica-lineas" class="absolute inset-0 flex items-end px-4 pb-4 gap-2 z-10">
-            <!-- Barras / puntos generados por JS dinámicamente -->
-            <div class="w-full h-full flex items-center justify-center text-xs text-sub">Registra tus trades de Futuros (MNQ, NQ, ES) para ver la curva de crecimiento</div>
+        <!-- Contenedor Visual de la Curva de Crecimiento Lineal SVG -->
+        <div class="w-full h-64 prop-input rounded-xl p-4 flex flex-col justify-end relative overflow-hidden border border-white/5">
+          <div id="grafica-lineas" class="absolute inset-0 flex items-center justify-center z-10 p-2">
+            <div class="text-xs text-sub">Registra tus trades para ver la curva de crecimiento</div>
           </div>
           <div class="absolute inset-0 bg-gradient-to-t from-blue-500/5 to-transparent pointer-events-none"></div>
+        </div>
+        <!-- Firma para la comunidad en la tarjeta -->
+        <div class="flex justify-between items-center pt-2 border-t text-[11px] text-sub" style="border-color: var(--border-color);">
+          <span>PropTracker • @Edwinjosney</span>
+          <span id="fecha-generacion-tarjeta" class="font-mono"></span>
         </div>
       </div>
 
@@ -466,7 +492,7 @@
 
             <div>
               <label class="text-[11px] text-sub font-medium mb-1 block">Resultado ($ USD)</label>
-              <input type="number" step="0.01" id="j-resultado" placeholder="Ej. 250.00 o -100" required class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
+              <input type="number" step="0.01" id="j-resultado" placeholder="Ej: 250.00 o -120.50" required class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
             </div>
 
             <div>
@@ -481,7 +507,7 @@
 
             <div class="sm:col-span-2">
               <label class="text-[11px] text-sub font-medium mb-1 block">Notas / Lección / Configuración</label>
-              <input type="text" id="j-notas" placeholder="Ej. Volumen de apertura..." required class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
+              <input type="text" id="j-notas" placeholder="Ej: Volumen y VWAP apertura NY..." required class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
             </div>
 
             <div class="flex items-end lg:col-span-4">
@@ -547,6 +573,7 @@
     const fechaHoy = new Date().toISOString().split('T')[0];
     document.getElementById('fecha').value = fechaHoy;
     document.getElementById('j-fecha').value = fechaHoy;
+    document.getElementById('fecha-generacion-tarjeta').textContent = new Date().toLocaleDateString();
 
     window.cambiarVistaPrincipal = function(vista) {
       const vFinanzas = document.getElementById('vista-finanzas');
@@ -668,9 +695,10 @@
       let currentJournal = [];
 
       window.actualizarVista = function() {
-        const registrosFiltrados = obtenerRegistrosFiltrados(currentRegistros);
+        const registrosFiltrados = obtenerRegistrosFinanzasFiltrados(currentRegistros);
+        const journalFiltrado = obtenerJournalFiltrados(currentJournal);
         renderFinanzas(registrosFiltrados);
-        renderJournal(currentJournal);
+        renderJournal(journalFiltrado);
       };
 
       onValue(registrosRef, (snapshot) => {
@@ -752,7 +780,7 @@
       });
 
       document.getElementById('btn-exportar').addEventListener('click', () => {
-        const filtrados = obtenerRegistrosFiltrados(currentRegistros);
+        const filtrados = obtenerRegistrosFinanzasFiltrados(currentRegistros);
         let csv = "Fecha,Tipo_o_Sesion,Firma_o_Activo,Plataforma_o_Dir,Tamano_o_Psico,Estado_o_Notas,Concepto,Monto_USD\n";
         filtrados.forEach(r => {
           csv += `"${r.fecha || '-'}","${r.tipo}","${r.firma}","${r.plataforma}","${r.tamano}","${r.estado}","${r.concepto}","${r.monto}"\n`;
@@ -768,6 +796,26 @@
         a.click();
       });
 
+      // Botón para Compartir Tarjeta como Imagen con la comunidad
+      document.getElementById('btn-compartir-img').addEventListener('click', () => {
+        const tarjeta = document.getElementById('tarjeta-capturable');
+        const btnCompartir = document.getElementById('btn-compartir-img');
+        btnCompartir.textContent = "Generando imagen...";
+        
+        html2canvas(tarjeta, { backgroundColor: '#121620', scale: 2 }).then(canvas => {
+          const link = document.createElement('a');
+          link.download = `Rendimiento_Trading_${usuarioId}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          btnCompartir.textContent = "📸 Compartir Tarjeta";
+        }).catch(err => {
+          console.error(err);
+          btnCompartir.textContent = "📸 Compartir Tarjeta";
+          alert("No se pudo generar la imagen.");
+        });
+      });
+
+      // Filtros de Finanzas
       const filtroPeriodoSelect = document.getElementById('filtro-periodo');
       const filtroMesInput = document.getElementById('filtro-mes-especifico');
 
@@ -782,10 +830,27 @@
         }
         window.actualizarVista();
       });
-
       filtroMesInput.addEventListener('change', window.actualizarVista);
 
-      function obtenerRegistrosFiltrados(registros) {
+      // Filtros de Journal (Calendario por Meses)
+      const jFiltroPeriodoSelect = document.getElementById('j-filtro-periodo');
+      const jFiltroMesInput = document.getElementById('j-filtro-mes-especifico');
+
+      jFiltroPeriodoSelect.addEventListener('change', () => {
+        if (jFiltroPeriodoSelect.value === 'mes_especifico') {
+          jFiltroMesInput.classList.remove('hidden');
+          if (!jFiltroMesInput.value) {
+            jFiltroMesInput.value = new Date().toISOString().slice(0, 7);
+          }
+        } else {
+          jFiltroMesInput.classList.add('hidden');
+        }
+        document.getElementById('label-periodo-activo').textContent = jFiltroPeriodoSelect.options[jFiltroPeriodoSelect.selectedIndex].text;
+        window.actualizarVista();
+      });
+      jFiltroMesInput.addEventListener('change', window.actualizarVista);
+
+      function obtenerRegistrosFinanzasFiltrados(registros) {
         const periodo = filtroPeriodoSelect.value;
         const mesEspecificoVal = filtroMesInput.value;
         const ahora = new Date();
@@ -796,6 +861,35 @@
           if (periodo === 'todos') return true;
           if (!r.fecha) return true;
           const partes = r.fecha.split('-');
+          const rAnio = parseInt(partes[0]);
+          const rMes = parseInt(partes[1]) - 1;
+
+          if (periodo === 'mes_actual') return rAnio === anioActual && rMes === mesActual;
+          if (periodo === 'mes_anterior') {
+            const mesAnterior = mesActual === 0 ? 11 : mesActual - 1;
+            const anioMesAnterior = mesActual === 0 ? anioActual - 1 : anioActual;
+            return rAnio === anioMesAnterior && rMes === mesAnterior;
+          }
+          if (periodo === 'ytd') return rAnio === anioActual;
+          if (periodo === 'mes_especifico' && mesEspecificoVal) {
+            const [eAnio, eMes] = mesEspecificoVal.split('-').map(Number);
+            return rAnio === eAnio && rMes === (eMes - 1);
+          }
+          return true;
+        });
+      }
+
+      function obtenerJournalFiltrados(journalList) {
+        const periodo = jFiltroPeriodoSelect.value;
+        const mesEspecificoVal = jFiltroMesInput.value;
+        const ahora = new Date();
+        const anioActual = ahora.getFullYear();
+        const mesActual = ahora.getMonth();
+
+        return journalList.filter(j => {
+          if (periodo === 'todos') return true;
+          if (!j.fecha) return true;
+          const partes = j.fecha.split('-');
           const rAnio = parseInt(partes[0]);
           const rMes = parseInt(partes[1]) - 1;
 
@@ -903,43 +997,77 @@
         if (perdidasBrutas > 0) {
           profitFactor = gananciasBrutas / perdidasBrutas;
         } else if (gananciasBrutas > 0) {
-          profitFactor = gananciasBrutas; // Si no hay pérdidas, el PF es igual a las ganancias totales
+          profitFactor = gananciasBrutas; 
         }
 
-        // Renderizado visual de la Gráfica de Crecimiento
+        // Renderizado visual de la Curva de Crecimiento Lineal (SVG con tooltips dinámicos)
         const contenedorGrafica = document.getElementById('grafica-lineas');
         contenedorGrafica.innerHTML = '';
 
         if (journalList.length === 0) {
-          contenedorGrafica.innerHTML = `<div class="w-full h-full flex items-center justify-center text-xs text-sub">Registra tus trades de Futuros (MNQ, NQ, ES) para ver la curva de crecimiento</div>`;
-          document.getElementById('badge-pf-estado').textContent = "Sin datos suficientes";
+          contenedorGrafica.innerHTML = `<div class="text-xs text-sub text-center">No hay trades registrados para este periodo</div>`;
+          document.getElementById('badge-pf-estado').textContent = "Sin datos";
         } else {
           document.getElementById('badge-pf-estado').textContent = profitFactor >= 1.5 ? "🔥 Excelente Rendimiento" : (profitFactor >= 1 ? "📈 Rentable" : "⚠️ En Zona de Riesgo");
-          
-          // Generar barras dinámicas proporcionales para la gráfica visual intuitiva
+
+          const svgWidth = 800;
+          const svgHeight = 200;
+          const padding = 25;
+          const chartW = svgWidth - padding * 2;
+          const chartH = svgHeight - padding * 2;
+
           const maxVal = Math.max(...puntosGrafica, 1);
           const minVal = Math.min(...puntosGrafica, 0);
-          const rango = maxVal - minVal || 1;
+          const rangeVal = maxVal - minVal || 1;
 
-          journalList.forEach((j, index) => {
-            const val = puntosGrafica[index];
-            const alturaPct = Math.max(((val - minVal) / rango) * 80, 10);
-            const esPositivo = val >= 0;
-
-            const barraDiv = document.createElement('div');
-            barraDiv.className = "flex-1 flex flex-col items-center justify-end h-full group relative";
-            barraDiv.innerHTML = `
-              <div class="w-full rounded-t transition-all duration-300 ${esPositivo ? 'bg-emerald-500/80 hover:bg-emerald-400' : 'bg-red-500/80 hover:bg-red-400'}" style="height: ${alturaPct}%;"></div>
-              <span class="text-[9px] text-sub mt-1 font-mono truncate w-full text-center">${j.activo}</span>
-              <!-- Tooltip flotante -->
-              <div class="absolute bottom-full mb-2 hidden group-hover:flex flex-col bg-slate-900 text-white text-[10px] p-2 rounded-lg shadow-xl border border-white/10 z-30 whitespace-nowrap">
-                <span class="font-bold">${j.fecha} (${j.activo})</span>
-                <span>Trade: ${j.resultado >= 0 ? '+' : ''}$${j.resultado}</span>
-                <span class="text-emerald-400">Acumulado: $${val.toFixed(2)}</span>
-              </div>
-            `;
-            contenedorGrafica.appendChild(barraDiv);
+          let coordinates = puntosGrafica.map((val, idx) => {
+            let x = padding + (journalList.length === 1 ? chartW / 2 : (idx / (journalList.length - 1)) * chartW);
+            let y = svgHeight - padding - ((val - minVal) / rangeVal) * chartH;
+            return { x, y, val, trade: journalList[idx] };
           });
+
+          let pointsStr = coordinates.map(c => `${c.x},${c.y}`).join(' ');
+          let firstX = coordinates[0].x;
+          let lastX = coordinates[coordinates.length - 1].x;
+          let bottomY = svgHeight - padding;
+          let areaPoints = `${firstX},${bottomY} ${pointsStr} ${lastX},${bottomY}`;
+
+          let colorLinea = journalPnl >= 0 ? "#10B981" : "#EF4444";
+
+          let svgHTML = `
+            <svg viewBox="0 0 ${svgWidth} ${svgHeight}" class="w-full h-full overflow-visible">
+              <defs>
+                <linearGradient id="gradCurva" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="${colorLinea}" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="${colorLinea}" stop-opacity="0.0"/>
+                </linearGradient>
+              </defs>
+              <polygon points="${areaPoints}" fill="url(#gradCurva)" />
+              <polyline fill="none" stroke="${colorLinea}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" points="${pointsStr}" />
+          `;
+
+          // Puntos interactivos con tooltip avanzado al pasar el ratón
+          coordinates.forEach(c => {
+            let resTrade = Number(c.trade.resultado || 0);
+            let signoRes = resTrade >= 0 ? '+' : '';
+            svgHTML += `
+              <g class="cursor-pointer group/point">
+                <circle cx="${c.x}" cy="${c.y}" r="6" fill="${colorLinea}" class="transition-transform group-hover/point:scale-150" />
+                <circle cx="${c.x}" cy="${c.y}" r="16" fill="transparent" />
+                <!-- Tooltip interactivo flotante -->
+                <foreignObject x="${Math.max(0, Math.min(c.x - 70, svgWidth - 140))}" y="${Math.max(0, c.y - 75)}" width="140" height="70" class="hidden group-hover/point:block overflow-visible pointer-events-none z-50">
+                  <div xmlns="http://www.w3.org/1999/xhtml" class="bg-slate-900 text-white text-[11px] p-2 rounded-xl shadow-2xl border border-white/20 flex flex-col gap-0.5 text-center font-sans">
+                    <span class="font-bold text-blue-400">${c.trade.fecha}</span>
+                    <span>${c.trade.activo}: <b class="${resTrade >= 0 ? 'text-emerald-400' : 'text-red-400'}">${signoRes}$${resTrade.toFixed(2)}</b></span>
+                    <span class="text-[10px] text-sub">Acum: $${c.val.toFixed(2)}</span>
+                  </div>
+                </foreignObject>
+              </g>
+            `;
+          });
+
+          svgHTML += `</svg>`;
+          contenedorGrafica.innerHTML = svgHTML;
         }
 
         const winRate = journalList.length > 0 ? ((ganados / journalList.length) * 100).toFixed(1) : '0.0';
@@ -985,4 +1113,3 @@
   </script>
 </body>
 </html>
-
