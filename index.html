@@ -111,19 +111,21 @@
       transform: translateX(0);
     }
 
-    /* Sidebar Contraíble */
-    .sidebar-collapsed {
-      width: 4.5rem !important;
-    }
-    .sidebar-collapsed .sidebar-text,
-    .sidebar-collapsed .sidebar-badge,
-    .sidebar-collapsed .sidebar-header-text {
-      display: none !important;
-    }
-    .sidebar-collapsed .sidebar-item {
-      justify-content: center !important;
-      padding-left: 0.5rem !important;
-      padding-right: 0.5rem !important;
+    /* Sidebar Contraíble (Solo Desktop) */
+    @media (min-width: 768px) {
+      .sidebar-collapsed {
+        width: 4.5rem !important;
+      }
+      .sidebar-collapsed .sidebar-text,
+      .sidebar-collapsed .sidebar-badge,
+      .sidebar-collapsed .sidebar-header-text {
+        display: none !important;
+      }
+      .sidebar-collapsed .sidebar-item {
+        justify-content: center !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+      }
     }
   </style>
 </head>
@@ -166,8 +168,8 @@
   <!-- APLICACIÓN PRINCIPAL -->
   <div id="app-container" class="w-full min-h-screen flex flex-col md:flex-row hidden">
 
-    <!-- BARRA LATERAL (SIDEBAR) CONTRAÍBLE -->
-    <aside id="main-sidebar" class="w-full md:w-64 border-r p-4 flex flex-col justify-between shrink-0 transition-all duration-300" style="background-color: var(--bg-sidebar); border-color: var(--border-color);">
+    <!-- BARRA LATERAL (SIDEBAR) CONTRAÍBLE (Visible en Desktop, en móvil se usa barra inferior táctil) -->
+    <aside id="main-sidebar" class="hidden md:flex md:w-64 border-r p-4 flex-col justify-between shrink-0 transition-all duration-300" style="background-color: var(--bg-sidebar); border-color: var(--border-color);">
       <div class="space-y-6">
         
         <!-- Logo Header -->
@@ -355,63 +357,30 @@
 
         </div>
 
-        <!-- Fila Superior de Métricas (Dashboard) -->
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <!-- Fila Superior de Métricas (Dashboard de 4 Tarjetas Sencillas, Claras y Precisas) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
-          <!-- Tarjeta Grande: Payouts y Curva Multi-Línea con Tooltip -->
-          <div class="glass-card p-6 rounded-2xl lg:col-span-2 flex flex-col justify-between relative overflow-hidden">
+          <!-- Tarjeta 1: Payouts Cobrados en Total (Sin Gráficas, Información Directa) -->
+          <div class="glass-card p-6 rounded-2xl flex flex-col justify-between space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-sub uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Payouts cobrados
+              </span>
+              <div class="flex rounded-lg p-0.5 border text-[10px] font-bold" style="background-color: var(--bg-input); border-color: var(--border-color);">
+                <button onclick="cambiarModoBrutoNeto('bruto')" id="btn-bn-bruto-main" class="px-2 py-0.5 rounded text-sub hover:text-main transition">Bruto</button>
+                <button onclick="cambiarModoBrutoNeto('neto')" id="btn-bn-neto-main" class="px-2 py-0.5 rounded bg-blue-600 text-white transition">Neto</button>
+              </div>
+            </div>
+
             <div>
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div class="flex items-center gap-2">
-                  <span class="text-xs font-bold text-sub uppercase tracking-wider">PAYOUTS COBRADOS EN TOTAL</span>
-                  <div class="flex rounded-lg p-0.5 border text-[10px] font-bold" style="background-color: var(--bg-input); border-color: var(--border-color);">
-                    <button onclick="cambiarModoBrutoNeto('bruto')" id="btn-bn-bruto-main" class="px-2 py-0.5 rounded text-sub hover:text-main transition">Bruto</button>
-                    <button onclick="cambiarModoBrutoNeto('neto')" id="btn-bn-neto-main" class="px-2 py-0.5 rounded bg-blue-600 text-white transition">Neto</button>
-                  </div>
-                </div>
-
-                <!-- Leyenda de Curva Interactiva Multi-Línea -->
-                <div class="flex items-center gap-1 text-[11px] font-semibold">
-                  <span class="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-blue-600/20 text-blue-500 border border-blue-500/30">
-                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Beneficio
-                  </span>
-                  <span class="flex items-center gap-1 px-2 py-0.5 rounded-lg text-emerald-500 bg-emerald-500/10 border border-emerald-500/20">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Cobrado
-                  </span>
-                  <span class="flex items-center gap-1 px-2 py-0.5 rounded-lg text-rose-500 bg-rose-500/10 border border-rose-500/20">
-                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Gastos
-                  </span>
-                </div>
-              </div>
-
-              <div class="flex items-baseline gap-2 mt-3">
-                <span id="kpi-panel-payouts-main" class="text-4xl font-black text-emerald-500 font-mono privacy-blur">$0.00</span>
-              </div>
+              <div id="kpi-panel-payouts-main" class="text-3xl sm:text-4xl font-black text-emerald-500 font-mono privacy-blur">$0.00</div>
               <p id="badge-payouts-subtitle" class="text-xs text-sub mt-1">0 payouts · $0.00 netos tras el reparto</p>
             </div>
 
-            <!-- Curva SVG Multi-Línea con Tooltip Flotante de Tres Valores -->
-            <div class="w-full h-32 mt-4 relative">
-              <div id="chart-multi-tooltip" class="absolute top-2 right-4 glass-card px-3 py-2 rounded-xl border text-[11px] font-medium shadow-2xl pointer-events-none hidden z-20 space-y-0.5" style="background-color: var(--bg-card); border-color: var(--border-color);">
-                <div id="tooltip-date" class="text-[10px] text-sub font-bold border-b pb-1 mb-1" style="border-color: var(--border-color);">Fecha</div>
-                <div class="flex justify-between items-center gap-3"><span class="text-rose-500 flex items-center gap-1">● Gastos</span> <span id="tooltip-gastos" class="font-mono font-bold">$0</span></div>
-                <div class="flex justify-between items-center gap-3"><span class="text-emerald-500 flex items-center gap-1">● Cobrado</span> <span id="tooltip-cobrado" class="font-mono font-bold">$0</span></div>
-                <div class="flex justify-between items-center gap-3"><span class="text-blue-500 flex items-center gap-1">● Beneficio</span> <span id="tooltip-beneficio" class="font-mono font-bold">$0</span></div>
-              </div>
-
-              <svg id="svg-mini-curve" class="w-full h-full overflow-visible" viewBox="0 0 400 90" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="mini-gradient-blue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.35"/>
-                    <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.0"/>
-                  </linearGradient>
-                </defs>
-                <path id="svg-mini-area" fill="url(#mini-gradient-blue)" d="M 0 90 L 400 90 Z"/>
-                <path id="svg-line-gastos" fill="none" stroke="#F43F5E" stroke-width="2" stroke-linecap="round" d="M 0 45 L 400 45"/>
-                <path id="svg-line-cobrado" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" d="M 0 45 L 400 45"/>
-                <path id="svg-line-beneficio" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" d="M 0 45 L 400 45"/>
-                <g id="svg-multi-points"></g>
-              </svg>
+            <div class="pt-2 border-t flex items-center justify-between text-xs" style="border-color: var(--border-color);">
+              <span class="text-sub">Total cobros:</span>
+              <span id="badge-payouts-count-label" class="font-bold text-emerald-500 font-mono">0 retiros</span>
             </div>
           </div>
 
@@ -878,6 +847,32 @@
 
     </main>
 
+    <!-- BARRA DE NAVEGACIÓN INFERIOR PARA MÓVILES (TÁCTIL, FIJA Y SIN DESBORDES) -->
+    <nav id="mobile-bottom-nav" class="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t backdrop-blur-xl flex items-center justify-around py-2 px-1 transition-all" style="background-color: var(--bg-card); border-color: var(--border-color);">
+      <button onclick="navegarA('panel')" id="mob-nav-panel" class="flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-blue-500 font-bold transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span class="text-[10px]">Panel</span>
+      </button>
+      <button onclick="navegarA('cuentas')" id="mob-nav-cuentas" class="relative flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-sub hover:text-main transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+        <span class="text-[10px]">Cuentas</span>
+        <span id="mob-badge-cuentas" class="hidden absolute top-1 right-2 w-2 h-2 rounded-full bg-blue-500"></span>
+      </button>
+      <button onclick="navegarA('payouts')" id="mob-nav-payouts" class="relative flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-sub hover:text-main transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="text-[10px]">Payouts</span>
+        <span id="mob-badge-payouts" class="hidden absolute top-1 right-2 w-2 h-2 rounded-full bg-emerald-500"></span>
+      </button>
+      <button onclick="navegarA('estrategia')" id="mob-nav-estrategia" class="flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-sub hover:text-main transition">
+        <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+        <span class="text-[10px]">Estrategia</span>
+      </button>
+      <button onclick="navegarA('journal')" id="mob-nav-journal" class="flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-sub hover:text-main transition">
+        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        <span class="text-[10px]">Journal</span>
+      </button>
+    </nav>
+
   </div>
 
   <!-- DRAWER: NUEVA CUENTA -->
@@ -1277,14 +1272,18 @@
       vistas.forEach(v => {
         const el = document.getElementById(`vista-${v}`);
         const btn = document.getElementById(`nav-${v}`);
+        const mobBtn = document.getElementById(`mob-nav-${v}`);
         if (el) el.classList.add('hidden');
         if (btn) btn.className = "sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-sub hover:text-main hover:bg-black/5 dark:hover:bg-white/5 transition";
+        if (mobBtn) mobBtn.className = "flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-sub hover:text-main transition";
       });
 
       const vistaActiva = document.getElementById(`vista-${vista}`);
       const btnActivo = document.getElementById(`nav-${vista}`);
+      const mobBtnActivo = document.getElementById(`mob-nav-${vista}`);
       if (vistaActiva) vistaActiva.classList.remove('hidden');
       if (btnActivo) btnActivo.className = "sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold bg-blue-600 text-white transition shadow-sm";
+      if (mobBtnActivo) mobBtnActivo.className = "flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-blue-500 font-bold transition scale-105";
 
       const titulos = {
         panel: 'Panel General',
@@ -1556,6 +1555,14 @@
       });
     }
 
+    function formatearMoneda(val, incluirSigno = false) {
+      const num = Number(val || 0);
+      const absStr = Math.abs(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (num < 0) return `-$${absStr}`;
+      if (num > 0 && incluirSigno) return `+$${absStr}`;
+      return `$${absStr}`;
+    }
+
     function actualizarTodo() {
       const regs = obtenerRegistrosFiltrados();
       const cuentas = obtenerCuentasFiltradas();
@@ -1569,152 +1576,129 @@
         if (r.tipo === 'payout') totalPayouts += m;
       });
 
+      // Beneficio neto = Total Cobrado (Payouts) - Total Invertido (Gastos)
       const pnlNeto = totalPayouts - totalInvertido;
-      const roi = totalInvertido > 0 ? ((pnlNeto / totalInvertido) * 100).toFixed(1) : '0.0';
+      
+      // ROI = ((Beneficio Neto) / Total Invertido) * 100
+      let roi = 0;
+      if (totalInvertido > 0) {
+        roi = (pnlNeto / totalInvertido) * 100;
+      } else if (totalPayouts > 0) {
+        roi = 100.0;
+      }
 
+      // 1. Tarjeta Payouts Cobrados
       const kpiPayoutsMain = document.getElementById('kpi-panel-payouts-main');
-      kpiPayoutsMain.textContent = `$${totalPayouts.toFixed(2)}`;
+      if (kpiPayoutsMain) kpiPayoutsMain.textContent = formatearMoneda(totalPayouts);
 
+      const payoutsFiltradosCount = regs.filter(r => r.tipo === 'payout').length;
+      const totalPayoutsGlobalCount = registrosList.filter(r => r.tipo === 'payout').length;
+      const badgePayoutsSub = document.getElementById('badge-payouts-subtitle');
+      if (badgePayoutsSub) {
+        badgePayoutsSub.textContent = `${payoutsFiltradosCount} payouts · ${formatearMoneda(totalPayouts)} netos tras el reparto`;
+      }
+      const badgeCountLabel = document.getElementById('badge-payouts-count-label');
+      if (badgeCountLabel) {
+        badgeCountLabel.textContent = `${payoutsFiltradosCount} retiros`;
+      }
+      const badgeSidePayouts = document.getElementById('badge-payouts-count');
+      if (badgeSidePayouts) badgeSidePayouts.textContent = totalPayoutsGlobalCount;
+      const mobBadgePayouts = document.getElementById('mob-badge-payouts');
+      if (mobBadgePayouts) {
+        if (totalPayoutsGlobalCount > 0) mobBadgePayouts.classList.remove('hidden');
+        else mobBadgePayouts.classList.add('hidden');
+      }
+
+      // 2. Tarjeta Beneficio Neto
       const kpiNeto = document.getElementById('kpi-panel-neto');
-      kpiNeto.textContent = `${pnlNeto >= 0 ? '+' : ''}$${pnlNeto.toFixed(2)}`;
-      kpiNeto.className = `text-3xl font-black font-mono privacy-blur ${pnlNeto >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+      if (kpiNeto) {
+        kpiNeto.textContent = formatearMoneda(pnlNeto, true);
+        kpiNeto.className = `text-3xl font-black font-mono privacy-blur ${pnlNeto >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+      }
 
       const roiEl = document.getElementById('kpi-panel-roi');
-      roiEl.textContent = `${roi >= 0 ? '↑' : '↓'} ${Math.abs(roi)}% ROI`;
-      roiEl.className = `text-xs font-bold ${roi >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+      if (roiEl) {
+        const roiSigno = roi >= 0 ? '↑ +' : '↓ ';
+        roiEl.textContent = `${roiSigno}${Math.abs(roi).toFixed(1)}% ROI`;
+        roiEl.className = `text-xs font-bold ${pnlNeto >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+      }
 
-      const totalPayoutsCount = registrosList.filter(r => r.tipo === 'payout').length;
-      document.getElementById('badge-payouts-subtitle').textContent = `${regs.filter(r => r.tipo === 'payout').length} payouts · $${totalPayouts.toFixed(2)} netos tras el reparto`;
-      document.getElementById('badge-payouts-count').textContent = totalPayoutsCount;
-      document.getElementById('kpi-panel-invertido').textContent = `$${totalInvertido.toFixed(2)}`;
-      document.getElementById('kpi-panel-cobrado-resumen').textContent = `$${totalPayouts.toFixed(2)}`;
+      const cobradoResumen = document.getElementById('kpi-panel-cobrado-resumen');
+      if (cobradoResumen) cobradoResumen.textContent = formatearMoneda(totalPayouts);
+
+      // 3. Tarjeta Invertido en cuentas
+      const kpiInvertido = document.getElementById('kpi-panel-invertido');
+      if (kpiInvertido) kpiInvertido.textContent = formatearMoneda(totalInvertido);
 
       const cuentasActivas = cuentas.filter(c => c.estado !== 'Quemada').length;
-      document.getElementById('kpi-panel-cuentas-info').textContent = `${cuentas.length} cuentas · ${cuentasActivas} activas`;
-      document.getElementById('badge-cuentas-count').textContent = cuentasActivas;
+      const gastosCount = regs.filter(r => r.tipo === 'gasto').length;
+      const cuentasInfoEl = document.getElementById('kpi-panel-cuentas-info');
+      if (cuentasInfoEl) {
+        if (cuentas.length > 0) {
+          cuentasInfoEl.textContent = `${cuentas.length} cuentas · ${cuentasActivas} activas`;
+        } else {
+          cuentasInfoEl.textContent = `${gastosCount} compras / gastos registrados`;
+        }
+      }
+      const badgeSideCuentas = document.getElementById('badge-cuentas-count');
+      if (badgeSideCuentas) badgeSideCuentas.textContent = cuentasActivas;
+      const mobBadgeCuentas = document.getElementById('mob-badge-cuentas');
+      if (mobBadgeCuentas) {
+        if (cuentasActivas > 0) mobBadgeCuentas.classList.remove('hidden');
+        else mobBadgeCuentas.classList.add('hidden');
+      }
 
+      // 4. Funding Ratio
       const decididas = cuentas.filter(c => c.estado === 'Quemada' || c.estado === 'Fondeada Sim' || c.estado === 'Fondeada Live').length;
       const aprobadas = cuentas.filter(c => c.estado === 'Fondeada Sim' || c.estado === 'Fondeada Live').length;
-      const fundingRatio = decididas > 0 ? ((aprobadas / decididas) * 100).toFixed(1) : '0.0';
+      const enCurso = cuentas.filter(c => c.estado === 'Evaluación').length;
+      const fundingRatio = decididas > 0 ? ((aprobadas / decididas) * 100) : 0;
       
-      document.getElementById('kpi-funding-ratio').textContent = `${fundingRatio}%`;
-      document.getElementById('circle-ratio-label').textContent = `${Math.round(fundingRatio)}%`;
-      document.getElementById('circle-progress').setAttribute('stroke-dasharray', `${Math.min(Math.round(fundingRatio), 100)}, 100`);
-      document.getElementById('kpi-funding-desc').textContent = `${aprobadas} de ${decididas} evaluaciones decididas`;
+      const kpiRatio = document.getElementById('kpi-funding-ratio');
+      if (kpiRatio) kpiRatio.textContent = `${fundingRatio.toFixed(1)}%`;
+      const circleLabel = document.getElementById('circle-ratio-label');
+      if (circleLabel) circleLabel.textContent = `${Math.round(fundingRatio)}%`;
+      const circleProg = document.getElementById('circle-progress');
+      if (circleProg) circleProg.setAttribute('stroke-dasharray', `${Math.min(Math.round(fundingRatio), 100)}, 100`);
+      
+      const fundingDesc = document.getElementById('kpi-funding-desc');
+      if (fundingDesc) {
+        if (decididas > 0) {
+          fundingDesc.textContent = `${aprobadas} de ${decididas} evaluaciones decididas`;
+        } else if (enCurso > 0) {
+          fundingDesc.textContent = `${enCurso} en curso · 0 decididas`;
+        } else {
+          fundingDesc.textContent = `0 evaluaciones decididas`;
+        }
+      }
 
-      renderizarMiniCurvaMultiLinea(regs);
       renderizarCalendario();
       renderizarPorEmpresa();
       renderizarTarjetasCuentas();
       renderizarTablaPayouts();
 
-      const ratioEf = totalInvertido > 0 ? (totalPayouts / totalInvertido).toFixed(2) : (totalPayouts > 0 ? '∞' : '0.0');
-      document.getElementById('an-ratio-eficiencia').textContent = `${ratioEf}x`;
-      const costoPa = aprobadas > 0 ? (totalInvertido / aprobadas).toFixed(2) : totalInvertido.toFixed(2);
-      document.getElementById('an-costo-promedio-pa').textContent = `$${costoPa}`;
-      document.getElementById('an-tasa-exito').textContent = `${fundingRatio}%`;
-    }
+      // Analítica
+      const ratioEf = totalInvertido > 0 ? (totalPayouts / totalInvertido).toFixed(2) : (totalPayouts > 0 ? '∞' : '0.00');
+      const anRatio = document.getElementById('an-ratio-eficiencia');
+      if (anRatio) anRatio.textContent = `${ratioEf}x`;
 
-    function renderizarMiniCurvaMultiLinea(regs) {
-      const lineBen = document.getElementById('svg-line-beneficio');
-      const lineGas = document.getElementById('svg-line-gastos');
-      const lineCob = document.getElementById('svg-line-cobrado');
-      const area = document.getElementById('svg-mini-area');
-      const pointsG = document.getElementById('svg-multi-points');
-      const tooltip = document.getElementById('chart-multi-tooltip');
-      pointsG.innerHTML = '';
+      const costoPa = aprobadas > 0 ? (totalInvertido / aprobadas) : totalInvertido;
+      const anCosto = document.getElementById('an-costo-promedio-pa');
+      if (anCosto) anCosto.textContent = formatearMoneda(costoPa);
 
-      const filtered = regs || obtenerRegistrosFiltrados();
-      const movs = [...filtered].sort((a,b) => new Date(a.fecha || a.timestamp) - new Date(b.fecha || b.timestamp));
-
-      if (movs.length === 0) {
-        lineBen.setAttribute('d', 'M 0 45 L 400 45');
-        lineGas.setAttribute('d', 'M 0 45 L 400 45');
-        lineCob.setAttribute('d', 'M 0 45 L 400 45');
-        area.setAttribute('d', 'M 0 45 L 400 45 L 400 90 L 0 90 Z');
-        return;
-      }
-
-      let acumBen = 0, acumCob = 0, acumGas = 0;
-      let puntos = [{ fecha: movs[0].fecha || 'Inicio', ben: 0, cob: 0, gas: 0 }];
-
-      movs.forEach(m => {
-        const val = Number(m.monto || 0);
-        if (m.tipo === 'payout') {
-          acumCob += val;
-          acumBen += val;
-        } else {
-          acumGas += val;
-          acumBen -= val;
-        }
-        puntos.push({ fecha: m.fecha || '', ben: acumBen, cob: acumCob, gas: acumGas });
-      });
-
-      const todosValores = puntos.flatMap(p => [p.ben, p.cob, -p.gas]);
-      const min = Math.min(0, ...todosValores);
-      const max = Math.max(10, ...todosValores);
-      const range = max - min || 1;
-
-      const w = 400;
-      const h = 90;
-      const step = puntos.length > 1 ? w / (puntos.length - 1) : w;
-
-      const getY = (val) => h - ((val - min) / range) * (h - 24) - 12;
-
-      let dBen = `M 0 ${getY(puntos[0].ben)} `;
-      let dCob = `M 0 ${getY(puntos[0].cob)} `;
-      let dGas = `M 0 ${getY(puntos[0].gas)} `;
-      let dArea = dBen;
-
-      puntos.forEach((p, idx) => {
-        const cx = idx * step;
-        const cyBen = getY(p.ben);
-        const cyCob = getY(p.cob);
-        const cyGas = getY(p.gas);
-
-        if (idx > 0) {
-          dBen += `L ${cx} ${cyBen} `;
-          dCob += `L ${cx} ${cyCob} `;
-          dGas += `L ${cx} ${cyGas} `;
-          dArea += `L ${cx} ${cyBen} `;
-        }
-
-        const hitCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        hitCircle.setAttribute("cx", cx);
-        hitCircle.setAttribute("cy", cyBen);
-        hitCircle.setAttribute("r", "12");
-        hitCircle.setAttribute("fill", "transparent");
-        hitCircle.style.cursor = "pointer";
-
-        hitCircle.addEventListener('mouseenter', () => {
-          document.getElementById('tooltip-date').textContent = p.fecha || 'Sin fecha';
-          document.getElementById('tooltip-gastos').textContent = `$${p.gas.toFixed(2)}`;
-          document.getElementById('tooltip-cobrado').textContent = `$${p.cob.toFixed(2)}`;
-          document.getElementById('tooltip-beneficio').textContent = `${p.ben >= 0 ? '+' : ''}$${p.ben.toFixed(2)}`;
-          tooltip.classList.remove('hidden');
-        });
-
-        hitCircle.addEventListener('mouseleave', () => {
-          tooltip.classList.add('hidden');
-        });
-
-        pointsG.appendChild(hitCircle);
-      });
-
-      dArea += `L ${w} ${h} L 0 ${h} Z`;
-      lineBen.setAttribute('d', dBen);
-      lineCob.setAttribute('d', dCob);
-      lineGas.setAttribute('d', dGas);
-      area.setAttribute('d', dArea);
+      const anTasa = document.getElementById('an-tasa-exito');
+      if (anTasa) anTasa.textContent = `${fundingRatio.toFixed(1)}%`;
     }
 
     function renderizarEstrategia() {
       const decididas = cuentasList.filter(c => c.estado === 'Quemada' || c.estado.includes('Fondeada')).length;
       const aprobadas = cuentasList.filter(c => c.estado.includes('Fondeada')).length;
-      const approvalRate = decididas > 0 ? Math.round((aprobadas / decididas) * 100) : 43;
+      const approvalRate = decididas > 0 ? ((aprobadas / decididas) * 100).toFixed(1) : '0.0';
 
-      document.getElementById('st-big-approval-rate').textContent = `${approvalRate}%`;
-      document.getElementById('st-detail-counts').textContent = `${aprobadas} de ${decididas || 1}`;
+      const bigApp = document.getElementById('st-big-approval-rate');
+      if (bigApp) bigApp.textContent = `${approvalRate}%`;
+      const detCount = document.getElementById('st-detail-counts');
+      if (detCount) detCount.textContent = `${aprobadas} de ${decididas} cuentas decididas`;
 
       let ganadas = 0, totalOps = journalList.length;
       let totalRes = 0;
@@ -1724,108 +1708,83 @@
         if (r > 0) ganadas++;
       });
       const perdidas = totalOps - ganadas;
-      const wr = totalOps > 0 ? ((ganadas / totalOps) * 100).toFixed(1) : '66.0';
+      const wr = totalOps > 0 ? ((ganadas / totalOps) * 100).toFixed(1) : '0.0';
 
-      document.getElementById('st-winrate').textContent = `${wr} %`;
-      document.getElementById('st-total-ops').textContent = totalOps || '0';
-      document.getElementById('st-ops-sub').textContent = `${ganadas} ganadas y ${perdidas} perdidas en bitácora`;
+      const stWr = document.getElementById('st-winrate');
+      if (stWr) stWr.textContent = `${wr} %`;
+      const stOps = document.getElementById('st-total-ops');
+      if (stOps) stOps.textContent = totalOps;
+      const stOpsSub = document.getElementById('st-ops-sub');
+      if (stOpsSub) stOpsSub.textContent = `${ganadas} ganadas y ${perdidas} perdidas en bitácora`;
       
       const resAcumEl = document.getElementById('st-resultado-acum');
-      resAcumEl.textContent = `${totalRes >= 0 ? '+' : ''}$${totalRes.toFixed(2)}`;
-      resAcumEl.className = `text-3xl font-black font-mono privacy-blur ${totalRes >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+      if (resAcumEl) {
+        resAcumEl.textContent = formatearMoneda(totalRes, true);
+        resAcumEl.className = `text-3xl font-black font-mono privacy-blur ${totalRes >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+      }
 
       const dotsContainer = document.getElementById('st-dots-matrix');
-      dotsContainer.innerHTML = '';
-      
-      const ultimos20 = [...journalList].slice(-20);
-      let ganadas20 = 0;
+      if (dotsContainer) {
+        dotsContainer.innerHTML = '';
+        const ultimos20 = [...journalList].slice(-20);
+        let ganadas20 = 0;
 
-      for (let i = 0; i < 20; i++) {
-        const dot = document.createElement('div');
-        dot.className = "w-3 h-3 rounded-full transition";
-        if (i < ultimos20.length) {
-          const res = Number(ultimos20[i].resultado || 0);
-          if (res > 0) {
-            dot.className += " bg-emerald-500 shadow-sm shadow-emerald-500/50";
-            ganadas20++;
+        for (let i = 0; i < 20; i++) {
+          const dot = document.createElement('div');
+          if (i < ultimos20.length) {
+            const res = Number(ultimos20[i].resultado || 0);
+            if (res > 0) {
+              dot.className = "w-3 h-3 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50";
+              ganadas20++;
+            } else {
+              dot.className = "w-3 h-3 rounded-full bg-rose-500 shadow-sm shadow-rose-500/50";
+            }
           } else {
-            dot.className += " bg-rose-500 shadow-sm shadow-rose-500/50";
+            dot.className = "w-3 h-3 rounded-full bg-slate-400/20 dark:bg-white/10 border border-white/5";
           }
-        } else {
-          const demoWin = (i % 3 !== 0);
-          dot.className += demoWin ? " bg-emerald-500/80" : " bg-rose-500/80";
-          if (demoWin) ganadas20++;
+          dotsContainer.appendChild(dot);
         }
-        dotsContainer.appendChild(dot);
+        const stUlt = document.getElementById('st-ultimas-ganadas');
+        if (stUlt) stUlt.textContent = `${ganadas20} ganadas (${ultimos20.length} registrados)`;
       }
-      document.getElementById('st-ultimas-ganadas').textContent = `${ganadas20} ganadas`;
 
+      // Curva de equidad real
       const sLine = document.getElementById('svg-strat-line');
       const sArea = document.getElementById('svg-strat-area');
-      let acum = 0;
-      let sPuntos = [0];
-      journalList.forEach(j => {
-        acum += Number(j.resultado || 0);
-        sPuntos.push(acum);
-      });
-      if (sPuntos.length <= 1) sPuntos = [0, 1500, 3200, 2800, 4500, 6200, 5800, 7500, 8900];
+      if (sLine && sArea) {
+        let acum = 0;
+        let sPuntos = [0];
+        journalList.forEach(j => {
+          acum += Number(j.resultado || 0);
+          sPuntos.push(acum);
+        });
 
-      const sMin = Math.min(...sPuntos);
-      const sMax = Math.max(...sPuntos);
-      const sRange = sMax - sMin || 1;
-      const sW = 500, sH = 150;
-      const sStep = sW / (sPuntos.length - 1);
-
-      let dSLine = `M 0 ${sH - ((sPuntos[0] - sMin) / sRange) * (sH - 30) - 15} `;
-      let dSArea = dSLine;
-
-      sPuntos.forEach((val, idx) => {
-        const cx = idx * sStep;
-        const cy = sH - ((val - sMin) / sRange) * (sH - 30) - 15;
-        if (idx > 0) {
-          dSLine += `L ${cx} ${cy} `;
-          dSArea += `L ${cx} ${cy} `;
-        }
-      });
-      dSArea += `L ${sW} ${sH} L 0 ${sH} Z`;
-      sLine.setAttribute('d', dSLine);
-      sArea.setAttribute('d', dSArea);
-
-      const barsG = document.getElementById('svg-bars-container');
-      barsG.innerHTML = '';
-      const demoSemanas = [
-        { semana: '1', val: 1200 },
-        { semana: '2', val: 850 },
-        { semana: '3', val: 2400 },
-        { semana: '4', val: 1600 },
-        { semana: '5', val: -1300 },
-        { semana: '6', val: 950 },
-        { semana: '7', val: 1800 }
-      ];
-
-      const maxAbs = Math.max(...demoSemanas.map(s => Math.abs(s.val)), 2500);
-      const barWidth = 24;
-      const spacing = 500 / demoSemanas.length;
-
-      demoSemanas.forEach((sem, idx) => {
-        const cx = idx * spacing + (spacing - barWidth) / 2;
-        const barH = (Math.abs(sem.val) / maxAbs) * 60;
-        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("x", cx);
-        rect.setAttribute("width", barWidth);
-        rect.setAttribute("rx", "4");
-
-        if (sem.val >= 0) {
-          rect.setAttribute("y", 75 - barH);
-          rect.setAttribute("height", barH);
-          rect.setAttribute("fill", "#10B981");
+        const sW = 500, sH = 150;
+        if (sPuntos.length <= 1) {
+          sLine.setAttribute('d', `M 0 75 L ${sW} 75`);
+          sArea.setAttribute('d', `M 0 75 L ${sW} 75 L ${sW} ${sH} L 0 ${sH} Z`);
         } else {
-          rect.setAttribute("y", 75);
-          rect.setAttribute("height", barH);
-          rect.setAttribute("fill", "#F43F5E");
+          const sMin = Math.min(0, ...sPuntos);
+          const sMax = Math.max(10, ...sPuntos);
+          const sRange = sMax - sMin || 1;
+          const sStep = sW / (sPuntos.length - 1);
+
+          let dSLine = `M 0 ${sH - ((sPuntos[0] - sMin) / sRange) * (sH - 30) - 15} `;
+          let dSArea = dSLine;
+
+          sPuntos.forEach((val, idx) => {
+            const cx = idx * sStep;
+            const cy = sH - ((val - sMin) / sRange) * (sH - 30) - 15;
+            if (idx > 0) {
+              dSLine += `L ${cx} ${cy} `;
+              dSArea += `L ${cx} ${cy} `;
+            }
+          });
+          dSArea += `L ${sW} ${sH} L 0 ${sH} Z`;
+          sLine.setAttribute('d', dSLine);
+          sArea.setAttribute('d', dSArea);
         }
-        barsG.appendChild(rect);
-      });
+      }
     }
 
     // CALENDARIO
@@ -2036,44 +1995,45 @@
 
     function renderizarPorEmpresa() {
       const tbody = document.getElementById('tabla-por-empresa');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       const empresasMap = {};
 
+      // 1. Gastos e Ingresos reales consolidados desde registros
+      registrosList.forEach(r => {
+        const emp = (r.firma || 'Otra').trim();
+        if (!empresasMap[emp]) empresasMap[emp] = { nombre: emp, cuentas: 0, activas: 0, quemadas: 0, invertido: 0, cobrado: 0 };
+        const m = Number(r.monto || 0);
+        if (r.tipo === 'gasto') empresasMap[emp].invertido += m;
+        if (r.tipo === 'payout') empresasMap[emp].cobrado += m;
+      });
+
+      // 2. Conteo de cuentas
       cuentasList.forEach(c => {
-        const emp = c.empresa || 'Otra';
+        const emp = (c.empresa || 'Otra').trim();
         if (!empresasMap[emp]) empresasMap[emp] = { nombre: emp, cuentas: 0, activas: 0, quemadas: 0, invertido: 0, cobrado: 0 };
         empresasMap[emp].cuentas++;
         if (c.estado === 'Quemada') empresasMap[emp].quemadas++;
         else empresasMap[emp].activas++;
-        empresasMap[emp].invertido += Number(c.coste || 0);
-        empresasMap[emp].cobrado += Number(c.payoutsAcumulados || 0);
-      });
-
-      registrosList.forEach(r => {
-        const emp = r.firma || 'Otra';
-        if (!empresasMap[emp]) empresasMap[emp] = { nombre: emp, cuentas: 0, activas: 0, quemadas: 0, invertido: 0, cobrado: 0 };
-        if (r.tipo === 'payout' && !cuentasList.some(c => c.cuentaId === r.cuentaId)) {
-          empresasMap[emp].cobrado += Number(r.monto || 0);
-        }
       });
 
       const lista = Object.values(empresasMap);
       if (lista.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-sub">No hay cuentas registradas aún. Haz clic en <strong>+ Nuevo</strong> para añadir la primera.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-sub">No hay cuentas ni registros contables aún. Haz clic en <strong>+ Nuevo</strong> para añadir la primera.</td></tr>`;
         return;
       }
 
       lista.forEach(item => {
         const neto = item.cobrado - item.invertido;
-        const roi = item.invertido > 0 ? ((neto / item.invertido) * 100).toFixed(1) : '0.0';
+        const roi = item.invertido > 0 ? ((neto / item.invertido) * 100) : (item.cobrado > 0 ? 100 : 0);
 
         const tr = document.createElement('tr');
         tr.className = "hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition";
         tr.innerHTML = `
           <td class="py-3.5 px-3">
             <div class="flex items-center gap-2">
-              <span class="w-6 h-6 rounded-md bg-blue-600/20 text-blue-500 font-black text-[10px] flex items-center justify-center">${item.nombre.charAt(0)}</span>
+              <span class="w-6 h-6 rounded-md bg-blue-600/20 text-blue-500 font-black text-[10px] flex items-center justify-center">${item.nombre.charAt(0).toUpperCase()}</span>
               <span class="font-bold text-main">${item.nombre}</span>
             </div>
           </td>
@@ -2083,13 +2043,13 @@
               ${item.activas} Activas
             </span>
           </td>
-          <td class="py-3.5 px-3 text-right font-mono text-sub privacy-blur">$${item.invertido.toFixed(2)}</td>
-          <td class="py-3.5 px-3 text-right font-mono text-emerald-500 font-bold privacy-blur">$${item.cobrado.toFixed(2)}</td>
+          <td class="py-3.5 px-3 text-right font-mono text-sub privacy-blur">${formatearMoneda(item.invertido)}</td>
+          <td class="py-3.5 px-3 text-right font-mono text-emerald-500 font-bold privacy-blur">${formatearMoneda(item.cobrado)}</td>
           <td class="py-3.5 px-3 text-right font-mono font-black privacy-blur ${neto >= 0 ? 'text-emerald-500' : 'text-rose-500'}">
-            ${neto >= 0 ? '+' : ''}$${neto.toFixed(2)}
+            ${formatearMoneda(neto, true)}
           </td>
           <td class="py-3.5 px-3 text-right font-mono font-bold ${roi >= 0 ? 'text-emerald-500' : 'text-rose-500'}">
-            ${roi}%
+            ${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%
           </td>
         `;
         tbody.appendChild(tr);
