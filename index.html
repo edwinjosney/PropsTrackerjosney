@@ -132,8 +132,8 @@
 <body class="min-h-screen flex flex-col md:flex-row antialiased selection:bg-blue-600 selection:text-white" onclick="cerrarDropdownsClickAfuera(event)">
 
   <!-- MODAL DE ACCESO / LOGIN -->
-  <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl p-4 hidden">
-    <div class="glass-card w-full max-w-md p-8 rounded-2xl space-y-6 shadow-2xl border border-white/10">
+  <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl p-4 overflow-y-auto hidden">
+    <div class="glass-card w-full max-w-md p-6 sm:p-8 rounded-2xl space-y-6 shadow-2xl border border-white/10 my-auto">
       <div class="flex items-center justify-center gap-3">
         <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/25">
           <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
@@ -300,6 +300,11 @@
           <button id="btn-exportar" class="p-2 glass-card rounded-xl text-sub hover:text-main transition flex items-center justify-center text-xs font-semibold px-3 gap-1.5" title="Exportar CSV">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
             <span class="hidden sm:inline">CSV</span>
+          </button>
+
+          <!-- Botón Cerrar Sesión (Móvil) -->
+          <button onclick="cerrarSesion()" class="md:hidden p-2 glass-card rounded-xl text-sub hover:text-rose-500 transition flex items-center justify-center" title="Cerrar Sesión">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
           </button>
 
           <!-- BOTÓN + NUEVO CON MENÚ DESPLEGABLE FLOTANTE -->
