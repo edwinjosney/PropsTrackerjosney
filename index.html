@@ -1,599 +1,1043 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PropTracker & Pro Journal - Edwin Josney</title>
+  <title>PropTracker • Edwin Josney</title>
+  <meta name="theme-color" content="#0B0F17">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: ['class', '[data-theme="dark"]'],
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#EFF6FF',
+              500: '#3B82F6',
+              600: '#2563EB',
+              700: '#1D4ED8',
+            }
+          }
+        }
+      }
+    }
+  </script>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
     :root {
-      --bg-body: #121620;        
-      --bg-card: rgba(22, 28, 38, 0.75); 
-      --bg-input: rgba(30, 38, 52, 0.6);  
-      --border-color: rgba(255, 255, 255, 0.08); 
-      --text-main: #FFFFFF;      
-      --text-sub: #94A3B8;       
-      --brand-blue: #3B82F6;     
+      --bg-body: #0B0F17;
+      --bg-sidebar: #0E131F;
+      --bg-card: rgba(19, 25, 39, 0.78);
+      --bg-input: rgba(26, 34, 52, 0.7);
+      --border-color: rgba(255, 255, 255, 0.07);
+      --text-main: #FFFFFF;
+      --text-sub: #94A3B8;
+      --shadow-glass: 0 10px 30px 0 rgba(0, 0, 0, 0.25);
     }
 
     [data-theme="light"] {
-      --bg-body: #F1F3F6;        
-      --bg-card: rgba(255, 255, 255, 0.85); 
-      --bg-input: rgba(241, 245, 249, 0.8);  
-      --border-color: rgba(0, 0, 0, 0.08);   
-      --text-main: #0F172A;      
-      --text-sub: #64748B;       
-      --brand-blue: #2563EB;
+      --bg-body: #F1F5F9;
+      --bg-sidebar: rgba(255, 255, 255, 0.95);
+      --bg-card: rgba(255, 255, 255, 0.85);
+      --bg-input: rgba(241, 245, 249, 0.9);
+      --border-color: rgba(0, 0, 0, 0.08);
+      --text-main: #0F172A;
+      --text-sub: #64748B;
+      --shadow-glass: 0 10px 30px 0 rgba(0, 0, 0, 0.06);
     }
 
     body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: var(--bg-body);
       color: var(--text-main);
       transition: background-color 0.3s ease, color 0.3s ease;
-      background-image: radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.06) 0%, transparent 45%),
-                        radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.04) 0%, transparent 45%);
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.04) 0%, transparent 40%);
       background-attachment: fixed;
     }
 
-    .prop-card {
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .glass-card {
       background-color: var(--bg-card);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--border-color);
-      box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.15);
-      transition: all 0.3s ease;
+      box-shadow: var(--shadow-glass);
+      border-radius: 1rem;
+      transition: all 0.2s ease;
     }
-
-    .prop-card:hover {
+    .glass-card:hover {
       border-color: rgba(59, 130, 246, 0.3);
     }
 
-    .prop-input {
+    .glass-input {
       background-color: var(--bg-input);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid var(--border-color);
       color: var(--text-main);
+      transition: all 0.15s ease;
     }
-
-    .prop-input:focus {
-      border-color: var(--brand-blue);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    .glass-input:focus {
+      outline: none;
+      border-color: #3B82F6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
     }
 
     .text-sub { color: var(--text-sub); }
     .text-main { color: var(--text-main); }
 
-    .prop-table-head {
-      background-color: var(--bg-input);
-      border-bottom: 1px solid var(--border-color);
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Modo Privacidad (Ojo) */
+    .privacy-active .privacy-blur {
+      filter: blur(8px);
+      user-select: none;
     }
 
-    .prop-table-row {
-      border-bottom: 1px solid var(--border-color);
-      transition: background-color 0.15s ease;
+    /* Animación del Drawer Lateral */
+    .drawer-enter {
+      transform: translateX(100%);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .drawer-open {
+      transform: translateX(0);
     }
 
-    .prop-table-row:hover {
-      background-color: var(--bg-input);
+    /* Sidebar Contraíble */
+    .sidebar-collapsed {
+      width: 4.5rem !important;
     }
-
-    summary::-webkit-details-marker {
-      display: none;
+    .sidebar-collapsed .sidebar-text,
+    .sidebar-collapsed .sidebar-badge,
+    .sidebar-collapsed .sidebar-header-text {
+      display: none !important;
     }
-    summary {
-      list-style: none;
+    .sidebar-collapsed .sidebar-item {
+      justify-content: center !important;
+      padding-left: 0.5rem !important;
+      padding-right: 0.5rem !important;
     }
   </style>
-
-  <script>
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-  </script>
 </head>
-<body class="min-h-screen p-4 md:p-8 font-sans">
+<body class="min-h-screen flex flex-col md:flex-row antialiased selection:bg-blue-600 selection:text-white" onclick="cerrarDropdownsClickAfuera(event)">
 
-  <!-- MODAL / PANTALLA DE ACCESO -->
-  <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 hidden">
-    <div class="prop-card w-full max-w-md p-6 rounded-2xl space-y-6">
-      <div class="text-center space-y-1">
-        <h2 class="text-2xl font-extrabold text-main">PROPTRACKER</h2>
-        <p class="text-sub text-xs">Acceso Privado para integrantes</p>
+  <!-- MODAL DE ACCESO / LOGIN -->
+  <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl p-4 hidden">
+    <div class="glass-card w-full max-w-md p-8 rounded-2xl space-y-6 shadow-2xl border border-white/10">
+      <div class="flex items-center justify-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/25">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+        </div>
+        <div>
+          <h2 class="text-2xl font-black tracking-tight text-main">PROPTRACKER</h2>
+          <p class="text-xs text-sub font-medium">Control Institucional para Traders</p>
+        </div>
       </div>
 
-      <div class="flex rounded-xl p-1 bg-black/20 border border-white/10">
+      <div class="flex rounded-xl p-1 bg-black/20 border border-white/5">
         <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white transition">Iniciar Sesión</button>
-        <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-bold rounded-lg text-sub transition">Crear Cuenta</button>
+        <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-bold rounded-lg text-sub hover:text-main transition">Crear Cuenta</button>
       </div>
 
       <form id="form-auth" class="space-y-4">
         <div>
-          <label class="text-[11px] text-sub font-medium mb-1 block">Usuario o Código de Alumno</label>
-          <input type="text" id="auth-user" placeholder="Ej. edwin" required class="w-full prop-input rounded-xl p-3 text-sm focus:outline-none">
+          <label class="text-xs font-semibold text-sub block mb-1.5">Usuario o Alumno</label>
+          <input type="text" id="auth-user" placeholder="Ej. edwinjosney" required class="w-full glass-input rounded-xl p-3 text-sm">
         </div>
         <div>
-          <label class="text-[11px] text-sub font-medium mb-1 block">Contraseña de Acceso</label>
-          <input type="password" id="auth-pass" placeholder="••••••••" required class="w-full prop-input rounded-xl p-3 text-sm focus:outline-none">
+          <label class="text-xs font-semibold text-sub block mb-1.5">Contraseña</label>
+          <input type="password" id="auth-pass" placeholder="••••••••" required class="w-full glass-input rounded-xl p-3 text-sm">
         </div>
-        <button type="submit" id="btn-auth-submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl p-3 transition shadow-lg shadow-blue-600/25">
-          Entrar a mi Tracker
+        <button type="submit" id="btn-auth-submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-xl py-3.5 transition shadow-lg shadow-blue-600/30">
+          Entrar a mi Panel
         </button>
       </form>
     </div>
   </div>
 
   <!-- APLICACIÓN PRINCIPAL -->
-  <div id="app-container" class="max-w-6xl mx-auto space-y-6 hidden">
-    
-    <!-- Encabezado Principal -->
-    <div class="prop-card p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-      <div>
-        <div class="flex items-center gap-3">
-          <h1 class="text-3xl font-extrabold tracking-wide text-main">PROPTRACKER</h1>
+  <div id="app-container" class="w-full min-h-screen flex flex-col md:flex-row hidden">
+
+    <!-- BARRA LATERAL (SIDEBAR) CONTRAÍBLE -->
+    <aside id="main-sidebar" class="w-full md:w-64 border-r p-4 flex flex-col justify-between shrink-0 transition-all duration-300" style="background-color: var(--bg-sidebar); border-color: var(--border-color);">
+      <div class="space-y-6">
+        
+        <!-- Logo Header -->
+        <div class="flex items-center justify-between px-2 py-1">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shrink-0 shadow-md shadow-blue-600/20">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+            </div>
+            <div class="sidebar-header-text">
+              <div class="flex items-center gap-2">
+                <span class="font-extrabold text-base text-main tracking-wide">PropTracker</span>
+                <span class="text-[10px] bg-blue-500/20 text-blue-500 px-1.5 py-0.5 rounded font-bold border border-blue-500/30">PRO</span>
+              </div>
+              <p class="text-[11px] text-sub font-medium truncate">Edwin Josney</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grupo TRACKER -->
+        <div class="space-y-1">
+          <span class="sidebar-header-text text-[10px] font-bold uppercase tracking-wider text-sub px-3">Tracker</span>
           
-          </span>
+          <button onclick="navegarA('panel')" id="nav-panel" class="sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold bg-blue-600 text-white transition shadow-sm" title="Panel">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+              <span class="sidebar-text">Panel</span>
+            </div>
+          </button>
+
+          <button onclick="navegarA('cuentas')" id="nav-cuentas" class="sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-sub hover:text-main hover:bg-black/5 dark:hover:bg-white/5 transition" title="Cuentas">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              <span class="sidebar-text">Cuentas</span>
+            </div>
+            <span id="badge-cuentas-count" class="sidebar-badge text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 font-bold border border-blue-500/20">0</span>
+          </button>
+
+          <button onclick="navegarA('payouts')" id="nav-payouts" class="sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-sub hover:text-main hover:bg-black/5 dark:hover:bg-white/5 transition" title="Payouts">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span class="sidebar-text">Payouts</span>
+            </div>
+            <span id="badge-payouts-count" class="sidebar-badge text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-bold border border-emerald-500/20">0</span>
+          </button>
+
+          <button onclick="navegarA('analitica')" id="nav-analitica" class="sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-sub hover:text-main hover:bg-black/5 dark:hover:bg-white/5 transition" title="Analítica">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              <span class="sidebar-text">Analítica</span>
+            </div>
+          </button>
         </div>
-        <p class="text-sub text-xs md:text-sm mt-1">
-          Control Financiero • @Edwinjosney <span id="status-sync" class="text-emerald-400 font-semibold"></span>
-        </p>
+
+        <!-- Grupo ESTRATEGIAS -->
+        <div class="space-y-1">
+          <span class="sidebar-header-text text-[10px] font-bold uppercase tracking-wider text-sub px-3">Estrategias</span>
+          
+          <button onclick="navegarA('estrategia')" id="nav-estrategia" class="sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-sub hover:text-main hover:bg-black/5 dark:hover:bg-white/5 transition" title="Estrategia">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+              <span class="sidebar-text font-bold">Estrategia</span>
+            </div>
+            <span class="sidebar-badge text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold border border-emerald-500/20">Forward</span>
+          </button>
+        </div>
+
+        <!-- Grupo JOURNAL (Renombrado solo a Journal) -->
+        <div class="space-y-1">
+          <span class="sidebar-header-text text-[10px] font-bold uppercase tracking-wider text-sub px-3">Trading</span>
+          
+          <button onclick="navegarA('journal')" id="nav-journal" class="sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-sub hover:text-main hover:bg-black/5 dark:hover:bg-white/5 transition" title="Journal">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4 shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              <span class="sidebar-text font-bold">Journal</span>
+            </div>
+          </button>
+        </div>
+
       </div>
 
-      <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
-        <div class="flex items-center gap-2 prop-input px-3 py-2 rounded-xl text-xs">
-          <span class="text-sub font-semibold">Hola,</span>
-          <span id="display-usuario" class="font-bold text-main">Cargando...</span>
-          <button onclick="cerrarSesion()" class="ml-2 text-xs text-red-400 hover:underline font-bold">Salir</button>
-        </div>
-
-        <button id="theme-toggle" class="p-2.5 prop-card rounded-xl hover:opacity-80 transition flex items-center justify-center text-sub h-full shadow-sm" aria-label="Cambiar tema" title="Modo Claro / Oscuro">
-          <span id="theme-icon" class="flex items-center justify-center"></span>
+      <!-- Footer: Botón Contraer Panel & Perfil de Usuario -->
+      <div class="pt-4 border-t space-y-3" style="border-color: var(--border-color);">
+        <!-- Botón de Contraer / Expandir Sidebar (Exacto a Colmena) -->
+        <button onclick="toggleSidebar()" id="btn-toggle-sidebar" class="sidebar-item w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-sub hover:text-main hover:bg-black/5 dark:hover:bg-white/5 transition" title="Contraer o expandir barra lateral">
+          <svg id="icon-sidebar-collapse" class="w-4 h-4 shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+          <span class="sidebar-text font-medium" id="sidebar-toggle-text">Contraer</span>
         </button>
-        <button id="btn-exportar" class="text-xs bg-slate-700/40 hover:bg-slate-700/60 text-white font-semibold px-4 py-2.5 rounded-xl border border-slate-600/40 transition shadow-sm">
-          Exportar CSV
-        </button>
-        <button id="btn-limpiar" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold px-3 py-2.5 rounded-xl border border-red-500/30 transition shadow-sm">
-          Reiniciar
-        </button>
-      </div>
-    </div>
 
-    <!-- PESTAÑAS DE NAVEGACIÓN -->
-    <div class="flex rounded-2xl p-1.5 prop-card gap-2">
-      <button onclick="cambiarVistaPrincipal('finanzas')" id="btn-vista-finanzas" class="flex-1 py-3 text-xs font-bold rounded-xl bg-blue-600 text-white transition shadow-sm">
-        📊 Finanzas & Cuentas de Fondeo
-      </button>
-      <button onclick="cambiarVistaPrincipal('journal')" id="btn-vista-journal" class="flex-1 py-3 text-xs font-bold rounded-xl text-sub hover:text-main transition shadow-sm">
-        📝 Pro Journal de Trades (Futuros)
-      </button>
-    </div>
-
-    <!-- ================= VISTA 1: FINANZAS ================= -->
-    <div id="vista-finanzas" class="space-y-6">
-      <div class="prop-card p-4 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-        <div class="flex items-center gap-2">
-          <label for="filtro-periodo" class="text-xs font-bold text-main uppercase tracking-wider">Métricas por Periodo</label>
-        </div>
-        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
-          <select id="filtro-periodo" class="prop-input rounded-xl p-2.5 text-xs font-semibold focus:outline-none transition-colors w-full sm:w-auto">
-            <option value="todos">Todo el Historial</option>
-            <option value="mes_actual" selected>Mes Actual</option>
-            <option value="mes_anterior">Mes Anterior</option>
-            <option value="ytd">Año Actual</option>
-            <option value="mes_especifico">Elegir Mes Específico...</option>
-          </select>
-          <input type="month" id="filtro-mes-especifico" class="prop-input rounded-xl p-2 text-xs focus:outline-none hidden w-full sm:w-auto">
+        <div class="flex items-center justify-between pt-1">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div class="w-8 h-8 rounded-full bg-blue-600/20 text-blue-500 border border-blue-500/30 flex items-center justify-center font-bold text-xs shrink-0">
+              E
+            </div>
+            <div class="sidebar-header-text overflow-hidden">
+              <p id="display-sidebar-user" class="text-xs font-bold text-main truncate">Edwinjosney</p>
+              <p class="text-[10px] text-sub">Cuenta Trader</p>
+            </div>
+          </div>
+          <button onclick="cerrarSesion()" class="sidebar-header-text text-sub hover:text-rose-500 p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition" title="Cerrar Sesión">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </button>
         </div>
       </div>
+    </aside>
 
-      <!-- KPIs Finanzas -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="prop-card p-5 rounded-2xl space-y-1 relative overflow-hidden shadow-sm">
-          <span class="text-sub text-xs font-semibold uppercase tracking-wider">Inversión Total</span>
-          <div id="kpi-inversion" class="text-3xl font-black text-red-500">$0.00</div>
-          <p class="text-[10px] text-sub">Evaluaciones, Resets & Fees</p>
+    <!-- ÁREA DE CONTENIDO PRINCIPAL -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto no-scrollbar">
+      
+      <!-- TOPBAR SUPERIOR (Buscar, Modo Privacidad, Tema Claro/Oscuro, + Nuevo con Dropdown) -->
+      <header class="h-16 px-6 border-b flex items-center justify-between shrink-0 sticky top-0 z-30 backdrop-blur-md transition-colors" style="background-color: var(--bg-card); border-color: var(--border-color);">
+        <div class="flex items-center gap-3">
+          <h1 id="header-view-title" class="text-lg font-black text-main tracking-tight">Panel</h1>
         </div>
 
-        <div class="prop-card p-5 rounded-2xl space-y-1 relative overflow-hidden shadow-sm">
-          <span class="text-sub text-xs font-semibold uppercase tracking-wider">Payouts Totales</span>
-          <div id="kpi-payouts" class="text-3xl font-black text-emerald-400">$0.00</div>
-          <p class="text-[10px] text-sub">Cobros Netos Retirados</p>
-        </div>
+        <div class="flex items-center gap-2.5">
+          <!-- Botón Modo Privacidad (Ojo) -->
+          <button id="btn-privacy-toggle" onclick="toggleModoPrivacidad()" class="p-2 glass-card rounded-xl text-sub hover:text-main transition flex items-center justify-center" title="Ocultar o mostrar balances">
+            <svg id="icon-eye-open" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            <svg id="icon-eye-closed" class="w-4 h-4 hidden text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+          </button>
 
-        <div class="prop-card p-5 rounded-2xl space-y-1 relative overflow-hidden shadow-sm">
-          <span class="text-sub text-xs font-semibold uppercase tracking-wider">P&L Neto Real</span>
-          <div id="kpi-pnl" class="text-3xl font-black text-main">$0.00</div>
-          <p class="text-[10px] text-sub">Ganancia / Pérdida Real</p>
-        </div>
+          <!-- Botón Tema Claro / Oscuro (Liquid Glass Toggle) -->
+          <button id="btn-theme-toggle" onclick="toggleTema()" class="p-2 glass-card rounded-xl text-sub hover:text-main transition flex items-center justify-center" title="Cambiar Tema Claro / Oscuro">
+            <span id="theme-icon-container"></span>
+          </button>
 
-        <div class="prop-card p-5 rounded-2xl space-y-1 relative overflow-hidden shadow-sm">
-          <span class="text-sub text-xs font-semibold uppercase tracking-wider">ROI Real</span>
-          <div id="kpi-roi" class="text-3xl font-black text-emerald-400">0.0%</div>
-          <p class="text-[10px] text-sub">Retorno sobre la Inversión</p>
-        </div>
-      </div>
+          <!-- Botón Exportar CSV -->
+          <button id="btn-exportar" class="p-2 glass-card rounded-xl text-sub hover:text-main transition flex items-center justify-center text-xs font-semibold px-3 gap-1.5" title="Exportar CSV">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <span class="hidden sm:inline">CSV</span>
+          </button>
 
-      <!-- Rendimiento y Salud -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div class="prop-card p-6 rounded-2xl lg:col-span-2 flex flex-col justify-between space-y-4 shadow-sm">
-          <div class="flex justify-between items-center">
-            <div>
-              <span class="text-xs text-sub uppercase font-bold tracking-wider">Rendimiento Operativo</span>
-              <h3 class="text-lg font-bold text-main mt-0.5">Balance y P&L del Periodo</h3>
-            </div>
-            <span class="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20">Total</span>
-          </div>
-          <div class="py-4 flex items-end gap-3">
-            <div id="card-pnl-large" class="text-4xl font-black text-emerald-400">$0.00</div>
-            <div class="text-xs text-sub mb-1.5 font-medium">Margen Neto Global</div>
-          </div>
-          <div class="w-full bg-slate-700/30 rounded-full h-2 overflow-hidden border border-slate-600/30">
-            <div id="progress-bar" class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-          </div>
-        </div>
+          <!-- BOTÓN + NUEVO CON MENÚ DESPLEGABLE FLOTANTE -->
+          <div class="relative">
+            <button id="btn-nuevo-toggle" onclick="toggleDropdownNuevo(event)" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-lg shadow-blue-600/25 flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+              <span>+ Nuevo</span>
+            </button>
 
-        <div class="prop-card p-6 rounded-2xl flex flex-col justify-between space-y-2 shadow-sm">
-          <span class="text-xs text-sub uppercase font-bold tracking-wider">Salud Financiera</span>
-          <div>
-            <div class="text-2xl font-bold text-main" id="ratio-eficiencia">0.0x</div>
-            <p class="text-xs text-sub mt-1">Ratio Payout / Inversión en cuentas.</p>
-          </div>
-          <div class="pt-2 border-t" style="border-color: var(--border-color);">
-            <span class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
-              Base de datos independiente protegida
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Formulario Finanzas -->
-      <details id="panel-formulario" class="prop-card rounded-2xl overflow-hidden group transition-all duration-200 shadow-sm">
-        <summary class="p-4 sm:p-5 flex items-center justify-between cursor-pointer select-none hover:opacity-90 transition-opacity">
-          <div class="flex items-center gap-2">
-            <span class="text-main font-bold text-base flex items-center gap-2">
-              ➕Registrar Nuevo Movimiento / Cuenta
-            </span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-sub font-medium group-open:hidden">Abrir Formulario</span>
-            <span class="text-xs text-sub font-medium hidden group-open:inline">Cerrar Formulario</span>
-            <svg class="w-4 h-4 text-main transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
-        </summary>
-
-        <div class="p-6 pt-2 border-t" style="border-color: var(--border-color);">
-          <form id="tracker-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
-            <div>
-              <label class="text-[11px] text-sub font-medium mb-1 block">Tipo de Movimiento</label>
-              <select id="tipo" class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
-                <option value="gasto">🔴Gasto / Evaluación</option>
-                <option value="payout">🟢Payout / Cobro</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="text-[11px] text-sub font-medium mb-1 block">Fecha del Movimiento</label>
-              <input type="date" id="fecha" required class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
-            </div>
-
-            <div>
-              <label class="text-[11px] text-sub font-medium mb-1 block">Firma de Fondeo</label>
-              <input type="text" id="firma" placeholder="Ej. Lucid Trading" required class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
-            </div>
-
-            <div>
-              <label class="text-[11px] text-sub font-medium mb-1 block">Plataforma</label>
-              <select id="plataforma" class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
-                <option value="Tradovate">Tradovate</option>
-                <option value="Rithmic">Rithmic</option>
-                <option value="NinjaTrader">NinjaTrader</option>
-                <option value="DXFeed">DXFeed</option>
-                <option value="MatchTrader">MatchTrader</option>
-                <option value="Otra">Otra</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="text-[11px] text-sub font-medium mb-1 block">Tamaño de Cuenta</label>
-              <select id="tamano" class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
-                <option value="50k">$50,000 (50k)</option>
-                <option value="25k">$25,000 (25k)</option>
-                <option value="100k">$100,000 (100k)</option>
-                <option value="150k">$150,000 (150k)</option>
-                <option value="N/A">(Otro / Payout)</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="text-[11px] text-sub font-medium mb-1 block">Estado Actual</label>
-              <select id="estado" class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
-                <option value="Evaluación">En Evaluación</option>
-                <option value="Fondeada Sim">Fondeada Sim / PA</option>
-                <option value="Fondeada Live">Fondeada Live</option>
-                <option value="Quemada">Quemada / Suspendida</option>
-                <option value="Cobrado">Payout Completado</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="text-[11px] text-sub font-medium mb-1 block">Concepto / Detalle</label>
-              <input type="text" id="concepto" placeholder="Ej: Eval 50k Flex" required class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
-            </div>
-
-            <div>
-              <label class="text-[11px] text-sub font-medium mb-1 block">Monto ($ USD)</label>
-              <input type="number" step="0.01" id="monto" placeholder="Ej. 130.50" required class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
-            </div>
-
-            <div class="flex items-end lg:col-span-4">
-              <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl p-2.5 transition shadow-lg shadow-blue-600/20">
-                Guardar Registro
+            <!-- Menú Flotante Dropdown -->
+            <div id="dropdown-nuevo" class="absolute right-0 mt-2 w-48 glass-card rounded-2xl p-1.5 shadow-2xl border hidden z-50 space-y-1 transition-all" style="border-color: var(--border-color); background-color: var(--bg-card);">
+              <button onclick="abrirDrawerNuevaCuenta(); cerrarDropdownNuevo();" class="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-bold text-main hover:bg-blue-600 hover:text-white rounded-xl transition text-left">
+                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                <span>Nueva cuenta</span>
+              </button>
+              <button onclick="abrirModalPayout(); cerrarDropdownNuevo();" class="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-bold text-main hover:bg-emerald-600 hover:text-white rounded-xl transition text-left">
+                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Registrar payout</span>
               </button>
             </div>
-          </form>
-        </div>
-      </details>
-
-      <!-- Tabla Finanzas -->
-      <div class="prop-card rounded-2xl overflow-hidden shadow-sm">
-        <div class="p-4 flex justify-between items-center border-b" style="border-color: var(--border-color);">
-          <h2 class="text-base font-bold text-main">Historial de Operaciones Financieras</h2>
-          <span id="contador-registros" class="text-xs text-sub">Cargando base de datos...</span>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm text-main">
-            <thead class="prop-table-head text-sub uppercase text-[11px] font-bold tracking-wider">
-              <tr>
-                <th class="p-3.5">Fecha</th>
-                <th class="p-3.5">Tipo</th>
-                <th class="p-3.5">Firma</th>
-                <th class="p-3.5">Plataforma</th>
-                <th class="p-3.5">Tamaño</th>
-                <th class="p-3.5">Estado</th>
-                <th class="p-3.5">Concepto</th>
-                <th class="p-3.5 text-right">Monto</th>
-                <th class="p-3.5 text-center">Borrar</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-registros"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-
-    <!-- ================= VISTA 2: JOURNAL DE TRADING (GRÁFICA LINEAL PRO + FILTRO PERIODOS) ================= -->
-    <div id="vista-journal" class="space-y-6 hidden">
-      
-      <!-- Filtro de Periodos para el Journal -->
-      <div class="prop-card p-4 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-        <div class="flex items-center gap-2">
-          <label for="j-filtro-periodo" class="text-xs font-bold text-main uppercase tracking-wider">Filtro de Bitácora por Periodo</label>
-        </div>
-        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
-          <select id="j-filtro-periodo" class="prop-input rounded-xl p-2.5 text-xs font-semibold focus:outline-none transition-colors w-full sm:w-auto">
-            <option value="todos">Todo el Historial</option>
-            <option value="mes_actual" selected>Mes Actual</option>
-            <option value="mes_anterior">Mes Anterior</option>
-            <option value="ytd">Año Actual</option>
-            <option value="mes_especifico">Elegir Mes Específico...</option>
-          </select>
-          <input type="month" id="j-filtro-mes-especifico" class="prop-input rounded-xl p-2 text-xs focus:outline-none hidden w-full sm:w-auto">
-        </div>
-      </div>
-
-      <!-- KPIs Journal -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="prop-card p-5 rounded-2xl space-y-1 shadow-sm">
-          <span class="text-sub text-xs font-semibold uppercase tracking-wider">Profit Factor</span>
-          <div id="journal-profit-factor" class="text-3xl font-black text-blue-400">0.00</div>
-          <p class="text-[10px] text-sub">Ganancias Brutas / Pérdidas Brutas</p>
-        </div>
-
-        <div class="prop-card p-5 rounded-2xl space-y-1 shadow-sm">
-          <span class="text-sub text-xs font-semibold uppercase tracking-wider">P&L Total del Periodo</span>
-          <div id="journal-pnl" class="text-3xl font-black text-main">$0.00</div>
-          <p class="text-[10px] text-sub">Suma neta del periodo</p>
-        </div>
-
-        <div class="prop-card p-5 rounded-2xl space-y-1 shadow-sm">
-          <span class="text-sub text-xs font-semibold uppercase tracking-wider">Win Rate (Acierto)</span>
-          <div id="journal-winrate" class="text-3xl font-black text-emerald-400">0.0%</div>
-          <p class="text-[10px] text-sub">Trades ganadores / total</p>
-        </div>
-
-        <div class="prop-card p-5 rounded-2xl space-y-1 shadow-sm">
-          <span class="text-sub text-xs font-semibold uppercase tracking-wider">Total Trades</span>
-          <div id="journal-total-trades" class="text-3xl font-black text-main">0</div>
-          <p class="text-[10px] text-sub">Operaciones ejecutadas</p>
-        </div>
-      </div>
-
-      <!-- Gráfica Lineal de Crecimiento (SVG Responsiva con Tooltip Táctil y de Mouse) -->
-      <div class="prop-card p-6 rounded-2xl space-y-4 shadow-sm">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-          <div>
-            <span class="text-xs text-sub uppercase font-bold tracking-wider">Curva de Equidad Lineal & Crecimiento</span>
-            <h3 class="text-lg font-bold text-main mt-0.5">Evolución del P&L a Través del Tiempo</h3>
           </div>
-          <span id="badge-pf-estado" class="px-3 py-1 rounded-lg bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/25">Sin datos</span>
-        </div>
-        
-        <!-- Contenedor SVG Responsivo -->
-        <div class="w-full h-64 prop-input rounded-xl p-3 relative overflow-hidden border border-white/5 flex flex-col justify-end">
-          <div id="tooltip-grafica" class="absolute top-3 left-3 bg-slate-900/90 backdrop-blur-md text-white text-[11px] px-3 py-1.5 rounded-lg border border-white/10 shadow-2xl pointer-events-none hidden z-30 transition-all"></div>
-          <svg id="svg-equity-curve" class="w-full h-full overflow-visible cursor-crosshair" viewBox="0 0 800 200" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="equity-gradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.35"/>
-                <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.0"/>
-              </linearGradient>
-            </defs>
-            <g id="svg-elements"></g>
-          </svg>
-        </div>
-      </div>
 
-      <!-- Formulario Journal Estilizado (Solo MNQ, NQ, ES) -->
-      <details id="panel-formulario-journal" class="prop-card rounded-2xl overflow-hidden group transition-all duration-200 shadow-sm">
-        <summary class="p-4 sm:p-5 flex items-center justify-between cursor-pointer select-none hover:opacity-90 transition-opacity">
-          <div class="flex items-center gap-2">
-            <span class="text-main font-bold text-base flex items-center gap-2">
-              ⚡ Registrar Nuevo Trade de Futuros (MNQ / NQ / ES)
-            </span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-sub font-medium group-open:hidden">Abrir Bitácora</span>
-            <span class="text-xs text-sub font-medium hidden group-open:inline">Cerrar Bitácora</span>
-            <svg class="w-4 h-4 text-main transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
-        </summary>
+        </div>
+      </header>
 
-        <div class="p-6 pt-2 border-t" style="border-color: var(--border-color);">
-          <form id="journal-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
+      <!-- ================= VISTA 1: PANEL ================= -->
+      <section id="vista-panel" class="p-6 space-y-6">
+
+        <!-- BARRA DE FILTROS SUPERIORES: TIEMPO (Todo, 12M, 90D, 30D, y Selector Completo de Año, Mes y Día Personalizado) -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          
+          <!-- Filtros de Tiempo con Selector Completo de Calendario Personalizado (Año, Mes, Día) en Cápsula Unificada -->
+          <div class="flex items-center gap-1 p-1 rounded-xl border text-xs font-semibold overflow-x-auto no-scrollbar" style="background-color: var(--bg-input); border-color: var(--border-color);">
+            <button onclick="cambiarFiltroTiempo('todo')" id="tf-todo" class="px-3.5 py-1.5 rounded-lg bg-blue-600 text-white transition shadow-sm">Todo</button>
+            <button onclick="cambiarFiltroTiempo('12m')" id="tf-12m" class="px-3 py-1.5 rounded-lg text-sub hover:text-main transition">12M</button>
+            <button onclick="cambiarFiltroTiempo('90d')" id="tf-90d" class="px-3 py-1.5 rounded-lg text-sub hover:text-main transition">90D</button>
+            <button onclick="cambiarFiltroTiempo('30d')" id="tf-30d" class="px-3 py-1.5 rounded-lg text-sub hover:text-main transition">30D</button>
+            
+            <!-- Selector Personalizado con Calendario Completo (Año, Mes y Día) -->
+            <div id="tf-fecha-container" class="relative flex items-center px-3 py-1.5 rounded-lg text-sub hover:text-main cursor-pointer transition select-none">
+              <div class="flex items-center gap-1.5 pointer-events-none">
+                <svg class="w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span id="texto-filtro-fecha">Personalizado...</span>
+                <svg id="arrow-filtro-fecha" class="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </div>
+              <input type="date" id="tf-fecha-personalizada" onchange="cambiarFiltroFechaPersonalizada(this.value)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10" title="Seleccionar año, mes y día de manera personalizada">
+              <button id="btn-limpiar-fecha" onclick="limpiarFiltroFechaPersonalizada(event)" class="hidden z-20 ml-2 text-sub hover:text-rose-400 text-xs font-bold" title="Restablecer">✕</button>
+            </div>
+          </div>
+
+          <!-- Filtro de Empresa Rápido (Pills: Todas, Lucid, Apex, etc.) -->
+          <div id="firma-pills-container" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            <button onclick="seleccionarFiltroEmpresa('todas')" id="p-pill-todas" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white transition shadow-sm">Todas</button>
+          </div>
+
+        </div>
+
+        <!-- Fila Superior de Métricas (Dashboard) -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          
+          <!-- Tarjeta Grande: Payouts y Curva Multi-Línea con Tooltip -->
+          <div class="glass-card p-6 rounded-2xl lg:col-span-2 flex flex-col justify-between relative overflow-hidden">
             <div>
-              <label class="text-[11px] text-sub font-medium mb-1 block">Fecha del Trade</label>
-              <input type="date" id="j-fecha" required class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-sub uppercase tracking-wider">PAYOUTS COBRADOS EN TOTAL</span>
+                  <div class="flex rounded-lg p-0.5 border text-[10px] font-bold" style="background-color: var(--bg-input); border-color: var(--border-color);">
+                    <button onclick="cambiarModoBrutoNeto('bruto')" id="btn-bn-bruto-main" class="px-2 py-0.5 rounded text-sub hover:text-main transition">Bruto</button>
+                    <button onclick="cambiarModoBrutoNeto('neto')" id="btn-bn-neto-main" class="px-2 py-0.5 rounded bg-blue-600 text-white transition">Neto</button>
+                  </div>
+                </div>
+
+                <!-- Leyenda de Curva Interactiva Multi-Línea -->
+                <div class="flex items-center gap-1 text-[11px] font-semibold">
+                  <span class="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-blue-600/20 text-blue-500 border border-blue-500/30">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Beneficio
+                  </span>
+                  <span class="flex items-center gap-1 px-2 py-0.5 rounded-lg text-emerald-500 bg-emerald-500/10 border border-emerald-500/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Cobrado
+                  </span>
+                  <span class="flex items-center gap-1 px-2 py-0.5 rounded-lg text-rose-500 bg-rose-500/10 border border-rose-500/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Gastos
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex items-baseline gap-2 mt-3">
+                <span id="kpi-panel-payouts-main" class="text-4xl font-black text-emerald-500 font-mono privacy-blur">$0.00</span>
+              </div>
+              <p id="badge-payouts-subtitle" class="text-xs text-sub mt-1">0 payouts · $0.00 netos tras el reparto</p>
+            </div>
+
+            <!-- Curva SVG Multi-Línea con Tooltip Flotante de Tres Valores -->
+            <div class="w-full h-32 mt-4 relative">
+              <div id="chart-multi-tooltip" class="absolute top-2 right-4 glass-card px-3 py-2 rounded-xl border text-[11px] font-medium shadow-2xl pointer-events-none hidden z-20 space-y-0.5" style="background-color: var(--bg-card); border-color: var(--border-color);">
+                <div id="tooltip-date" class="text-[10px] text-sub font-bold border-b pb-1 mb-1" style="border-color: var(--border-color);">Fecha</div>
+                <div class="flex justify-between items-center gap-3"><span class="text-rose-500 flex items-center gap-1">● Gastos</span> <span id="tooltip-gastos" class="font-mono font-bold">$0</span></div>
+                <div class="flex justify-between items-center gap-3"><span class="text-emerald-500 flex items-center gap-1">● Cobrado</span> <span id="tooltip-cobrado" class="font-mono font-bold">$0</span></div>
+                <div class="flex justify-between items-center gap-3"><span class="text-blue-500 flex items-center gap-1">● Beneficio</span> <span id="tooltip-beneficio" class="font-mono font-bold">$0</span></div>
+              </div>
+
+              <svg id="svg-mini-curve" class="w-full h-full overflow-visible" viewBox="0 0 400 90" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="mini-gradient-blue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.35"/>
+                    <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.0"/>
+                  </linearGradient>
+                </defs>
+                <path id="svg-mini-area" fill="url(#mini-gradient-blue)" d="M 0 90 L 400 90 Z"/>
+                <path id="svg-line-gastos" fill="none" stroke="#F43F5E" stroke-width="2" stroke-linecap="round" d="M 0 45 L 400 45"/>
+                <path id="svg-line-cobrado" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" d="M 0 45 L 400 45"/>
+                <path id="svg-line-beneficio" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" d="M 0 45 L 400 45"/>
+                <g id="svg-multi-points"></g>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Tarjeta: Beneficio Neto -->
+          <div class="glass-card p-6 rounded-2xl flex flex-col justify-between space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-sub uppercase tracking-wider flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 text-sub" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                Beneficio neto
+              </span>
+              <div class="flex rounded-lg p-0.5 border text-[10px] font-bold" style="background-color: var(--bg-input); border-color: var(--border-color);">
+                <button onclick="cambiarModoBrutoNeto('bruto')" id="btn-bn-bruto-sub" class="px-2 py-0.5 rounded text-sub hover:text-main transition">Bruto</button>
+                <button onclick="cambiarModoBrutoNeto('neto')" id="btn-bn-neto-sub" class="px-2 py-0.5 rounded bg-blue-600 text-white transition">Neto</button>
+              </div>
             </div>
 
             <div>
-              <label class="text-[11px] text-sub font-medium mb-1 block">Sesión</label>
-              <select id="j-sesion" class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
+              <div id="kpi-panel-neto" class="text-3xl font-black font-mono privacy-blur text-rose-500">$0.00</div>
+              <div class="flex items-center gap-2 mt-1">
+                <span id="kpi-panel-roi" class="text-xs font-bold text-rose-500">↓ 0.0% ROI</span>
+                <span class="text-[10px] text-sub">cobrado - invertido</span>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t flex items-center justify-between text-xs" style="border-color: var(--border-color);">
+              <span class="text-sub">Cobrado acumulado:</span>
+              <span id="kpi-panel-cobrado-resumen" class="font-bold text-emerald-500 privacy-blur">$0.00</span>
+            </div>
+          </div>
+
+          <!-- Columna Derecha: Invertido en Cuentas + Funding Ratio -->
+          <div class="flex flex-col gap-4">
+            
+            <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-2">
+              <span class="text-[11px] font-bold text-sub uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-sub" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                Invertido en cuentas
+              </span>
+              <div>
+                <div id="kpi-panel-invertido" class="text-2xl font-black text-main font-mono privacy-blur">$0.00</div>
+                <p id="kpi-panel-cuentas-info" class="text-xs text-sub mt-0.5">0 cuentas · 0 activas</p>
+              </div>
+            </div>
+
+            <div class="glass-card p-5 rounded-2xl flex items-center justify-between space-x-3">
+              <div class="relative w-14 h-14 shrink-0 flex items-center justify-center">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                  <path class="text-slate-300 dark:text-slate-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  <path id="circle-progress" class="text-blue-500 transition-all duration-700" stroke-dasharray="0, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                </svg>
+                <span id="circle-ratio-label" class="absolute text-[11px] font-black text-main">0%</span>
+              </div>
+              <div class="overflow-hidden">
+                <span class="text-[10px] font-bold text-sub uppercase tracking-wider block">Funding ratio</span>
+                <div id="kpi-funding-ratio" class="text-xl font-black text-main font-mono">0.0%</div>
+                <p id="kpi-funding-desc" class="text-[10px] text-sub mt-0.5 truncate">0 de 0 evaluaciones decididas</p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- SECCIÓN CALENDARIO -->
+        <div class="glass-card p-6 rounded-2xl space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-base font-extrabold text-main">Calendario</h3>
+              <p class="text-xs text-sub mt-0.5">Día a día y mes a mes • pulsa un mes de la lista para ver su calendario</p>
+            </div>
+
+            <div class="flex items-center p-1 rounded-xl border text-xs font-semibold" style="background-color: var(--bg-input); border-color: var(--border-color);">
+              <button onclick="cambiarFiltroCal('payouts')" id="cal-filter-payouts" class="px-3 py-1.5 rounded-lg text-sub hover:text-main transition">Payouts</button>
+              <button onclick="cambiarFiltroCal('gastos')" id="cal-filter-gastos" class="px-3 py-1.5 rounded-lg text-sub hover:text-main transition">Gastos</button>
+              <button onclick="cambiarFiltroCal('neto')" id="cal-filter-neto" class="px-3 py-1.5 rounded-lg bg-blue-600 text-white transition shadow-sm">Beneficio neto</button>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t" style="border-color: var(--border-color);">
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-1">
+                <button onclick="navegarMes(-1)" class="p-1.5 glass-card rounded-lg hover:text-main text-sub transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <h4 id="cal-mes-nombre" class="text-sm font-bold text-main px-2 min-w-[140px] text-center">Noviembre 2026</h4>
+                <button onclick="navegarMes(1)" class="p-1.5 glass-card rounded-lg hover:text-main text-sub transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+              <button onclick="irAMesActual()" class="px-2.5 py-1 text-xs font-bold rounded-lg glass-card text-sub hover:text-main transition">Hoy</button>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-sub">Total del mes:</span>
+              <span id="cal-total-mes" class="text-base font-black font-mono text-emerald-500 privacy-blur">$0.00</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+            <div class="xl:col-span-3">
+              <div class="grid grid-cols-7 gap-2 text-center text-[11px] font-bold text-sub pb-2">
+                <div>L</div>
+                <div>M</div>
+                <div>X</div>
+                <div>J</div>
+                <div>V</div>
+                <div>S-D</div>
+                <div class="text-blue-500">SEMANA</div>
+              </div>
+              <div id="cal-dias-grid" class="grid grid-cols-7 gap-2"></div>
+            </div>
+
+            <div class="glass-card p-4 rounded-xl space-y-3">
+              <div class="flex justify-between items-center pb-2 border-b" style="border-color: var(--border-color);">
+                <div class="flex items-center gap-1.5">
+                  <button onclick="navegarAnio(-1)" class="text-sub hover:text-main text-xs font-bold px-1">‹</button>
+                  <span id="cal-anio-label" class="text-xs font-bold text-main">2026</span>
+                  <button onclick="navegarAnio(1)" class="text-sub hover:text-main text-xs font-bold px-1">›</button>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] text-sub block">Total 2026</span>
+                  <span id="cal-total-anio" class="text-xs font-black font-mono text-rose-500 privacy-blur">$0.00</span>
+                </div>
+              </div>
+              <div id="cal-lista-meses" class="space-y-1.5"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN: POR EMPRESA -->
+        <div class="glass-card p-6 rounded-2xl space-y-4">
+          <div>
+            <h3 class="text-base font-extrabold text-main">Por empresa</h3>
+            <p class="text-xs text-sub mt-0.5">Beneficio neto = cobrado - invertido</p>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="text-sub uppercase text-[10px] font-bold border-b" style="border-color: var(--border-color);">
+                <tr>
+                  <th class="py-3 px-3">Empresa</th>
+                  <th class="py-3 px-3 text-center">Cuentas</th>
+                  <th class="py-3 px-3 text-center">Estado</th>
+                  <th class="py-3 px-3 text-right">Invertido</th>
+                  <th class="py-3 px-3 text-right">Cobrado</th>
+                  <th class="py-3 px-3 text-right">Beneficio Neto</th>
+                  <th class="py-3 px-3 text-right">ROI</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-por-empresa" class="divide-y font-medium" style="border-color: var(--border-color);"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================= VISTA: ESTRATEGIA ================= -->
+      <section id="vista-estrategia" class="p-6 space-y-6 hidden">
+        <div class="glass-card p-8 rounded-2xl text-center space-y-2 relative overflow-hidden">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-blue-500">
+            FORWARD TESTING EN CUENTAS REALES • REGLAS FIJAS, CERO DISCRECIONALIDAD
+          </div>
+          <div id="st-big-approval-rate" class="text-6xl sm:text-7xl font-black font-mono text-main tracking-tight">
+            43%
+          </div>
+          <div class="text-sm font-bold text-sub">
+            de tus evaluaciones se aprueban
+          </div>
+          <p id="st-approval-detail" class="text-xs text-sub max-w-lg mx-auto pt-1">
+            Con las señales reales: <strong class="text-main" id="st-detail-counts">0 de 0</strong> cuentas de evaluación simuladas aprobadas. Cada operación, ganada o perdida, está apuntada.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="glass-card p-5 rounded-2xl space-y-1">
+            <span class="text-[11px] font-bold text-sub uppercase tracking-wider flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Win rate forward
+            </span>
+            <div id="st-winrate" class="text-3xl font-black text-emerald-500 font-mono">66,0 %</div>
+            <p class="text-[10px] text-sub">Para no perder basta el 57 % · <span class="text-emerald-500 font-bold">+8.9 pts por encima</span></p>
+          </div>
+
+          <div class="glass-card p-5 rounded-2xl space-y-1">
+            <span class="text-[11px] font-bold text-sub uppercase tracking-wider flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              Operaciones
+            </span>
+            <div id="st-total-ops" class="text-3xl font-black text-main font-mono">0</div>
+            <p id="st-ops-sub" class="text-[10px] text-sub">0 ganadas y 0 perdidas en bitácora</p>
+          </div>
+
+          <div class="glass-card p-5 rounded-2xl space-y-1">
+            <span class="text-[11px] font-bold text-sub uppercase tracking-wider flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Resultado acumulado
+            </span>
+            <div id="st-resultado-acum" class="text-3xl font-black text-emerald-500 font-mono privacy-blur">$0.00</div>
+            <p class="text-[10px] text-sub">Suma total de señales operadas</p>
+          </div>
+
+          <div class="glass-card p-5 rounded-2xl space-y-2">
+            <span class="text-[11px] font-bold text-sub uppercase tracking-wider flex items-center gap-1.5">
+              ⚡ Últimas 20 operaciones
+            </span>
+            <div class="flex items-center justify-between">
+              <span id="st-ultimas-ganadas" class="text-xl font-black text-main">0 ganadas</span>
+            </div>
+            <div id="st-dots-matrix" class="grid grid-cols-10 gap-1.5 pt-1"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="glass-card p-6 rounded-2xl space-y-3">
+            <div>
+              <h3 class="text-sm font-bold text-main">Resultado acumulado</h3>
+              <p class="text-xs text-sub">Suma de todas las operaciones apuntadas con su curva de equidad</p>
+            </div>
+            <div class="w-full h-56 glass-input rounded-xl p-3 relative flex flex-col justify-end">
+              <svg id="svg-strat-curve" class="w-full h-full" viewBox="0 0 500 150" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="strat-gradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#10B981" stop-opacity="0.35"/>
+                    <stop offset="100%" stop-color="#10B981" stop-opacity="0.0"/>
+                  </linearGradient>
+                </defs>
+                <path id="svg-strat-area" fill="url(#strat-gradient)" d="M 0 150 L 500 150 Z"/>
+                <path id="svg-strat-line" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" d="M 0 75 L 500 75"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl space-y-3">
+            <div>
+              <h3 class="text-sm font-bold text-main">Resultado por semana</h3>
+              <p class="text-xs text-sub">Semanas en verde y semanas en rojo, sin maquillar</p>
+            </div>
+            <div class="w-full h-56 glass-input rounded-xl p-3 relative flex flex-col justify-end">
+              <svg id="svg-strat-bars" class="w-full h-full" viewBox="0 0 500 150">
+                <line x1="0" y1="75" x2="500" y2="75" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="3 3"/>
+                <g id="svg-bars-container"></g>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= VISTA 2: GESTIÓN DE CUENTAS ================= -->
+      <section id="vista-cuentas" class="p-6 space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-black text-main">Gestión de Cuentas Activas</h2>
+            <p class="text-xs text-sub">Controla cada cuenta comprada, cambia sus estados y solicita retiros</p>
+          </div>
+          <button onclick="abrirDrawerNuevaCuenta()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-lg shadow-blue-600/25 flex items-center gap-1.5 self-start sm:self-auto">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+            <span>+ Nueva Cuenta</span>
+          </button>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button onclick="filtrarCuentas('todas')" id="filtro-c-todas" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white transition">Todas (<span id="count-todas">0</span>)</button>
+          <button onclick="filtrarCuentas('evaluacion')" id="filtro-c-evaluacion" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold glass-card text-sub hover:text-main transition">Evaluaciones (<span id="count-eval">0</span>)</button>
+          <button onclick="filtrarCuentas('fondeada')" id="filtro-c-fondeada" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold glass-card text-sub hover:text-main transition">Fondeadas / PA (<span id="count-fond">0</span>)</button>
+          <button onclick="filtrarCuentas('quemada')" id="filtro-c-quemada" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold glass-card text-sub hover:text-main transition">Quemadas (<span id="count-quem">0</span>)</button>
+        </div>
+
+        <div id="grid-tarjetas-cuentas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </section>
+
+      <!-- ================= VISTA 3: PAYOUTS (Módulo dedicado) ================= -->
+      <section id="vista-payouts" class="p-6 space-y-6 hidden">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-black text-main">Historial y Control de Payouts</h2>
+            <p class="text-xs text-sub">Control total de retiros, splits netos y fechas de cobro</p>
+          </div>
+          <button onclick="abrirModalPayout()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-lg shadow-emerald-600/25 flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+            <span>+ Registrar Payout</span>
+          </button>
+        </div>
+
+        <div class="glass-card rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="text-sub uppercase text-[10px] font-bold border-b" style="border-color: var(--border-color); background-color: var(--bg-input);">
+                <tr>
+                  <th class="p-4">Fecha</th>
+                  <th class="p-4">Firma</th>
+                  <th class="p-4">ID de Cuenta</th>
+                  <th class="p-4">Concepto</th>
+                  <th class="p-4 text-right">Monto Neto</th>
+                  <th class="p-4 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-payouts-body" class="divide-y" style="border-color: var(--border-color);"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= VISTA 4: ANALÍTICA ================= -->
+      <section id="vista-analitica" class="p-6 space-y-6 hidden">
+        <div>
+          <h2 class="text-xl font-black text-main">Analítica Financiera Global</h2>
+          <p class="text-xs text-sub">Ratios de eficiencia, rentabilidad y salud operativa de tu trading de fondeo</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="glass-card p-5 rounded-2xl space-y-1">
+            <span class="text-xs text-sub font-bold uppercase">Ratio de Retorno (Payout / Gasto)</span>
+            <div id="an-ratio-eficiencia" class="text-3xl font-black text-main font-mono">0.0x</div>
+            <p class="text-[11px] text-sub">Dólares retirados por cada dólar gastado</p>
+          </div>
+
+          <div class="glass-card p-5 rounded-2xl space-y-1">
+            <span class="text-xs text-sub font-bold uppercase">Costo Promedio por PA Fondeada</span>
+            <div id="an-costo-promedio-pa" class="text-3xl font-black text-blue-500 font-mono">$0.00</div>
+            <p class="text-[11px] text-sub">Inversión necesaria para fondear 1 cuenta</p>
+          </div>
+
+          <div class="glass-card p-5 rounded-2xl space-y-1">
+            <span class="text-xs text-sub font-bold uppercase">Porcentaje de Éxito</span>
+            <div id="an-tasa-exito" class="text-3xl font-black text-emerald-500 font-mono">0%</div>
+            <p class="text-[11px] text-sub">Tasa de aprobación de evaluaciones</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= VISTA 5: JOURNAL (Renombrado solo a Journal) ================= -->
+      <section id="vista-journal" class="p-6 space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-black text-main">Journal</h2>
+            <p class="text-xs text-sub">Bitácora táctica con control psicológico y curva de equidad en tiempo real</p>
+          </div>
+          <button onclick="toggleFormJournal()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-lg shadow-blue-600/25 flex items-center gap-1.5 self-start sm:self-auto">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+            <span>+ Registrar Trade</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="glass-card p-5 rounded-2xl space-y-1">
+            <span class="text-sub text-xs font-bold uppercase">Profit Factor</span>
+            <div id="j-profit-factor" class="text-3xl font-black text-blue-500 font-mono">0.00</div>
+            <p class="text-[10px] text-sub">Ganancias Brutas / Pérdidas Brutas</p>
+          </div>
+
+          <div class="glass-card p-5 rounded-2xl space-y-1">
+            <span class="text-sub text-xs font-bold uppercase">P&L Journal</span>
+            <div id="j-pnl-total" class="text-3xl font-black text-main font-mono privacy-blur">$0.00</div>
+            <p class="text-[10px] text-sub">Suma total de trades</p>
+          </div>
+
+          <div class="glass-card p-5 rounded-2xl space-y-1">
+            <span class="text-sub text-xs font-bold uppercase">Win Rate</span>
+            <div id="j-winrate" class="text-3xl font-black text-emerald-500 font-mono">0.0%</div>
+            <p class="text-[10px] text-sub">Trades ganadores / total</p>
+          </div>
+
+          <div class="glass-card p-5 rounded-2xl space-y-1">
+            <span class="text-sub text-xs font-bold uppercase">Total Trades</span>
+            <div id="j-total-trades" class="text-3xl font-black text-main font-mono">0</div>
+            <p class="text-[10px] text-sub">Operaciones en bitácora</p>
+          </div>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl space-y-3">
+          <div class="flex justify-between items-center">
+            <h3 class="text-sm font-bold text-main">Curva de Equidad Acumulada</h3>
+            <span id="j-badge-estado" class="text-xs px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/25 font-bold">Sin datos</span>
+          </div>
+          <div class="w-full h-64 glass-input rounded-xl p-3 relative overflow-hidden flex flex-col justify-end">
+            <div id="tooltip-journal" class="absolute top-3 left-3 bg-slate-900/95 backdrop-blur-md text-white text-[11px] px-3 py-1.5 rounded-lg border border-white/10 shadow-2xl pointer-events-none hidden z-30"></div>
+            <svg id="svg-equity-curve" class="w-full h-full overflow-visible" viewBox="0 0 800 200" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="equity-grad-journal" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.0"/>
+                </linearGradient>
+              </defs>
+              <g id="svg-journal-elements"></g>
+            </svg>
+          </div>
+        </div>
+
+        <div id="panel-form-journal" class="glass-card p-6 rounded-2xl hidden space-y-4">
+          <h3 class="text-sm font-bold text-main">Registrar Operación en Journal</h3>
+          <form id="form-journal" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div>
+              <label class="text-[11px] text-sub font-semibold mb-1 block">Fecha</label>
+              <input type="date" id="trade-fecha" required class="w-full glass-input rounded-xl p-2.5 text-xs">
+            </div>
+            <div>
+              <label class="text-[11px] text-sub font-semibold mb-1 block">Sesión</label>
+              <select id="trade-sesion" class="w-full glass-input rounded-xl p-2.5 text-xs">
                 <option value="New York AM">New York AM</option>
                 <option value="New York PM">New York PM</option>
                 <option value="Londres">Londres</option>
                 <option value="Asia">Asia</option>
               </select>
             </div>
-
             <div>
-              <label class="text-[11px] text-sub font-medium mb-1 block">Activo de Futuros</label>
-              <select id="j-activo" class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors font-bold text-blue-400">
+              <label class="text-[11px] text-sub font-semibold mb-1 block">Activo</label>
+              <select id="trade-activo" class="w-full glass-input rounded-xl p-2.5 text-xs font-bold text-blue-500">
                 <option value="MNQ">MNQ (Micro Nasdaq)</option>
-                <option value="NQ">NQ (Nasdaq)</option>
+                <option value="NQ">NQ (Nasdaq E-mini)</option>
                 <option value="ES">ES (E-mini S&P)</option>
+                <option value="Otro">Otro activo</option>
               </select>
             </div>
-
             <div>
-              <label class="text-[11px] text-sub font-medium mb-1 block">Dirección</label>
-              <select id="j-direccion" class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
+              <label class="text-[11px] text-sub font-semibold mb-1 block">Dirección</label>
+              <select id="trade-direccion" class="w-full glass-input rounded-xl p-2.5 text-xs">
                 <option value="Compra (Long)">Compra (Long)</option>
                 <option value="Venta (Short)">Venta (Short)</option>
               </select>
             </div>
-
             <div>
-              <label class="text-[11px] text-sub font-medium mb-1 block">Resultado ($ USD)</label>
-              <input type="number" step="0.01" id="j-resultado" placeholder="Ej. 250.00 o -120.5" required class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
+              <label class="text-[11px] text-sub font-semibold mb-1 block">Resultado ($ USD)</label>
+              <input type="number" step="0.01" id="trade-resultado" placeholder="Ej. 180.50 o -75.00" required class="w-full glass-input rounded-xl p-2.5 text-xs">
             </div>
-
             <div>
-              <label class="text-[11px] text-sub font-medium mb-1 block">Estado Emocional / Psicológico</label>
-              <select id="j-psicologia" class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
+              <label class="text-[11px] text-sub font-semibold mb-1 block">Psicología / Emoción</label>
+              <select id="trade-psico" class="w-full glass-input rounded-xl p-2.5 text-xs">
                 <option value="Excelente / Disciplinado">Excelente / Disciplinado</option>
                 <option value="Ansioso / Dudas">Ansioso / Dudas</option>
                 <option value="FOMO / Apurado">FOMO / Apurado</option>
                 <option value="Venganza / Revancha">Venganza / Revancha</option>
               </select>
             </div>
-
             <div class="sm:col-span-2">
-              <label class="text-[11px] text-sub font-medium mb-1 block">Notas / Lección / Configuración</label>
-              <input type="text" id="j-notas" placeholder="Ej. Soporte diario respetado en apertura NY..." required class="w-full prop-input rounded-xl p-2.5 text-sm focus:outline-none transition-colors">
+              <label class="text-[11px] text-sub font-semibold mb-1 block">Notas / Setup</label>
+              <input type="text" id="trade-notas" placeholder="Ej. Reentrada en soporte diario..." required class="w-full glass-input rounded-xl p-2.5 text-xs">
             </div>
-
-            <div class="flex items-end lg:col-span-4">
-              <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl p-2.5 transition shadow-lg shadow-blue-600/20">
-                Guardar Trade en Bitácora Pro
-              </button>
+            <div class="sm:col-span-2 lg:col-span-4 flex justify-end gap-2 pt-2">
+              <button type="button" onclick="toggleFormJournal()" class="px-4 py-2 text-xs font-bold rounded-xl glass-card text-sub">Cancelar</button>
+              <button type="submit" class="px-5 py-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/30">Guardar Trade</button>
             </div>
           </form>
         </div>
-      </details>
 
-      <!-- Tabla Journal -->
-      <div class="prop-card rounded-2xl overflow-hidden shadow-sm">
-        <div class="p-4 flex justify-between items-center border-b" style="border-color: var(--border-color);">
-          <h2 class="text-base font-bold text-main">Bitácora de Trades Registrados</h2>
-          <span id="contador-journal" class="text-xs text-sub">Cargando journal...</span>
+        <div class="glass-card rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="text-sub uppercase text-[10px] font-bold border-b" style="border-color: var(--border-color); background-color: var(--bg-input);">
+                <tr>
+                  <th class="p-3.5">Fecha</th>
+                  <th class="p-3.5">Sesión</th>
+                  <th class="p-3.5">Activo</th>
+                  <th class="p-3.5">Dirección</th>
+                  <th class="p-3.5">Psicología</th>
+                  <th class="p-3.5">Notas</th>
+                  <th class="p-3.5 text-right">Resultado</th>
+                  <th class="p-3.5 text-center">Borrar</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-journal-body" class="divide-y" style="border-color: var(--border-color);"></tbody>
+            </table>
+          </div>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm text-main">
-            <thead class="prop-table-head text-sub uppercase text-[11px] font-bold tracking-wider">
-              <tr>
-                <th class="p-3.5">Fecha</th>
-                <th class="p-3.5">Sesión</th>
-                <th class="p-3.5">Activo</th>
-                <th class="p-3.5">Dirección</th>
-                <th class="p-3.5">Psicología</th>
-                <th class="p-3.5">Notas</th>
-                <th class="p-3.5 text-right">Resultado</th>
-                <th class="p-3.5 text-center">Borrar</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-journal"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+      </section>
+
+    </main>
 
   </div>
 
-  <!-- Scripts Globales -->
-  <script>
-    const sunSVG = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
-    const moonSVG = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+  <!-- DRAWER: NUEVA CUENTA -->
+  <div id="drawer-backdrop" onclick="cerrarDrawerNuevaCuenta()" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+  
+  <aside id="drawer-nueva-cuenta" class="fixed top-0 right-0 h-full w-full max-w-md border-l z-50 p-6 flex flex-col justify-between overflow-y-auto no-scrollbar drawer-enter shadow-2xl transition-colors" style="background-color: var(--bg-sidebar); border-color: var(--border-color);">
+    <div class="space-y-6">
+      <div class="flex items-center justify-between pb-4 border-b" style="border-color: var(--border-color);">
+        <div>
+          <h3 class="text-lg font-black text-main">Nueva cuenta</h3>
+          <p class="text-xs text-sub">Añade una evaluación o una cuenta fondeada al tracker</p>
+        </div>
+        <button onclick="cerrarDrawerNuevaCuenta()" class="text-sub hover:text-main p-1.5 rounded-lg transition">✕</button>
+      </div>
 
-    function setThemeUI(theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      const iconContainer = document.getElementById('theme-icon');
-      if (iconContainer) {
-        iconContainer.innerHTML = theme === 'dark' ? sunSVG : moonSVG;
-      }
-    }
+      <form id="form-nueva-cuenta" class="space-y-5">
+        <div>
+          <label class="text-xs font-bold text-main block mb-2">Empresa</label>
+          <div id="grid-empresas-selector" class="grid grid-cols-3 gap-2">
+            <button type="button" onclick="seleccionarEmpresa('Lucid')" data-empresa="Lucid" class="empresa-btn p-2 rounded-xl border glass-card hover:border-blue-500 flex items-center gap-2 text-left transition">
+              <span class="w-5 h-5 rounded-md bg-blue-600/30 text-blue-500 text-[10px] font-black flex items-center justify-center">L</span>
+              <span class="text-xs font-semibold text-main">Lucid</span>
+            </button>
+            <button type="button" onclick="seleccionarEmpresa('Tradeify')" data-empresa="Tradeify" class="empresa-btn p-2 rounded-xl border glass-card hover:border-blue-500 flex items-center gap-2 text-left transition">
+              <span class="w-5 h-5 rounded-md bg-emerald-600/30 text-emerald-500 text-[10px] font-black flex items-center justify-center">T</span>
+              <span class="text-xs font-semibold text-main">Tradeify</span>
+            </button>
+            <button type="button" onclick="seleccionarEmpresa('TopStep')" data-empresa="TopStep" class="empresa-btn p-2 rounded-xl border glass-card hover:border-blue-500 flex items-center gap-2 text-left transition">
+              <span class="w-5 h-5 rounded-md bg-amber-600/30 text-amber-500 text-[10px] font-black flex items-center justify-center">TS</span>
+              <span class="text-xs font-semibold text-main">TopStep</span>
+            </button>
+            <button type="button" onclick="seleccionarEmpresa('Apex')" data-empresa="Apex" class="empresa-btn p-2 rounded-xl border glass-card hover:border-blue-500 flex items-center gap-2 text-left transition">
+              <span class="w-5 h-5 rounded-md bg-purple-600/30 text-purple-500 text-[10px] font-black flex items-center justify-center">A</span>
+              <span class="text-xs font-semibold text-main">Apex</span>
+            </button>
+            <button type="button" onclick="seleccionarEmpresa('MFF')" data-empresa="MFF" class="empresa-btn p-2 rounded-xl border glass-card hover:border-blue-500 flex items-center gap-2 text-left transition">
+              <span class="w-5 h-5 rounded-md bg-amber-500/30 text-amber-500 text-[10px] font-black flex items-center justify-center">M</span>
+              <span class="text-xs font-semibold text-main">MFF</span>
+            </button>
+            <button type="button" onclick="seleccionarEmpresa('FTMO')" data-empresa="FTMO" class="empresa-btn p-2 rounded-xl border glass-card hover:border-blue-500 flex items-center gap-2 text-left transition">
+              <span class="w-5 h-5 rounded-md bg-cyan-600/30 text-cyan-500 text-[10px] font-black flex items-center justify-center">F</span>
+              <span class="text-xs font-semibold text-main">FTMO</span>
+            </button>
+            <button type="button" onclick="seleccionarEmpresa('TakeProfit')" data-empresa="TakeProfit" class="empresa-btn p-2 rounded-xl border glass-card hover:border-blue-500 flex items-center gap-2 text-left transition">
+              <span class="w-5 h-5 rounded-md bg-rose-600/30 text-rose-500 text-[10px] font-black flex items-center justify-center">TP</span>
+              <span class="text-xs font-semibold text-main">Take Profit</span>
+            </button>
+            <button type="button" onclick="seleccionarEmpresa('Bulenox')" data-empresa="Bulenox" class="empresa-btn p-2 rounded-xl border glass-card hover:border-blue-500 flex items-center gap-2 text-left transition">
+              <span class="w-5 h-5 rounded-md bg-blue-500/30 text-blue-500 text-[10px] font-black flex items-center justify-center">B</span>
+              <span class="text-xs font-semibold text-main">Bulenox</span>
+            </button>
+            <button type="button" onclick="seleccionarEmpresa('FundedNext')" data-empresa="FundedNext" class="empresa-btn p-2 rounded-xl border glass-card hover:border-blue-500 flex items-center gap-2 text-left transition">
+              <span class="w-5 h-5 rounded-md bg-indigo-600/30 text-indigo-500 text-[10px] font-black flex items-center justify-center">FN</span>
+              <span class="text-xs font-semibold text-main">FundedNext</span>
+            </button>
+            <button type="button" onclick="seleccionarEmpresa('AlphaFutures')" data-empresa="AlphaFutures" class="empresa-btn p-2 rounded-xl border glass-card hover:border-blue-500 flex items-center gap-2 text-left transition">
+              <span class="w-5 h-5 rounded-md bg-emerald-500/30 text-emerald-500 text-[10px] font-black flex items-center justify-center">α</span>
+              <span class="text-xs font-semibold text-main">Alpha</span>
+            </button>
+            <button type="button" onclick="seleccionarEmpresa('Earn2Trade')" data-empresa="Earn2Trade" class="empresa-btn p-2 rounded-xl border glass-card hover:border-blue-500 flex items-center gap-2 text-left transition">
+              <span class="w-5 h-5 rounded-md bg-orange-600/30 text-orange-500 text-[10px] font-black flex items-center justify-center">E2</span>
+              <span class="text-xs font-semibold text-main">Earn2Trade</span>
+            </button>
+            <button type="button" onclick="seleccionarEmpresa('Otra')" data-empresa="Otra" class="empresa-btn p-2 rounded-xl border glass-card hover:border-blue-500 flex items-center gap-2 text-left transition">
+              <span class="w-5 h-5 rounded-md bg-slate-500/20 text-slate-500 text-[10px] font-black flex items-center justify-center">+</span>
+              <span class="text-xs font-semibold text-main">Otra</span>
+            </button>
+          </div>
+          <input type="hidden" id="nc-empresa-val" value="Lucid" required>
+        </div>
 
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-    setThemeUI(currentTheme);
+        <div>
+          <label class="text-xs font-bold text-main block mb-1.5">Tipo</label>
+          <div class="flex rounded-xl p-1 border" style="background-color: var(--bg-input); border-color: var(--border-color);">
+            <button type="button" onclick="seleccionarTipoCuenta('Evaluación')" id="btn-tipo-eval" class="flex-1 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white transition">Evaluación</button>
+            <button type="button" onclick="seleccionarTipoCuenta('Fondeada')" id="btn-tipo-fond" class="flex-1 py-2 text-xs font-bold rounded-lg text-sub hover:text-main transition">Fondeada directa</button>
+          </div>
+          <input type="hidden" id="nc-tipo-val" value="Evaluación">
+        </div>
 
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-      const activeTheme = document.documentElement.getAttribute('data-theme');
-      const targetTheme = activeTheme === 'light' ? 'dark' : 'light';
-      localStorage.setItem('theme', targetTheme);
-      setThemeUI(targetTheme);
-    });
+        <div>
+          <label class="text-xs font-bold text-main block mb-1.5">ID de la cuenta</label>
+          <input type="text" id="nc-id" placeholder="Ej: LFE05082285050009 o APEX-9821" required class="w-full glass-input rounded-xl p-3 text-xs font-mono">
+        </div>
 
-    const fechaHoy = new Date().toISOString().split('T')[0];
-    document.getElementById('fecha').value = fechaHoy;
-    document.getElementById('j-fecha').value = fechaHoy;
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs font-bold text-main block mb-1.5">Fecha de compra</label>
+            <input type="date" id="nc-fecha" required class="w-full glass-input rounded-xl p-3 text-xs">
+          </div>
+          <div>
+            <label class="text-xs font-bold text-main block mb-1.5">Tamaño</label>
+            <select id="nc-tamano" class="w-full glass-input rounded-xl p-3 text-xs">
+              <option value="50K" selected>50K ($50,000)</option>
+              <option value="25K">25K ($25,000)</option>
+              <option value="100K">100K ($100,000)</option>
+              <option value="150K">150K ($150,000)</option>
+              <option value="250K">250K ($250,000)</option>
+              <option value="Otro">Otro tamaño</option>
+            </select>
+          </div>
+        </div>
 
-    window.cambiarVistaPrincipal = function(vista) {
-      const vFinanzas = document.getElementById('vista-finanzas');
-      const vJournal = document.getElementById('vista-journal');
-      const btnFinanzas = document.getElementById('btn-vista-finanzas');
-      const btnJournal = document.getElementById('btn-vista-journal');
+        <div>
+          <label class="text-xs font-bold text-main block mb-1.5">Coste ($ USD)</label>
+          <input type="number" step="0.01" id="nc-coste" placeholder="Ej: 130.00" required class="w-full glass-input rounded-xl p-3 text-xs font-mono">
+        </div>
 
-      if (vista === 'finanzas') {
-        vFinanzas.classList.remove('hidden');
-        vJournal.classList.add('hidden');
-        btnFinanzas.className = "flex-1 py-3 text-xs font-bold rounded-xl bg-blue-600 text-white transition shadow-sm";
-        btnJournal.className = "flex-1 py-3 text-xs font-bold rounded-xl text-sub hover:text-main transition shadow-sm";
-      } else {
-        vJournal.classList.remove('hidden');
-        vFinanzas.classList.add('hidden');
-        btnJournal.className = "flex-1 py-3 text-xs font-bold rounded-xl bg-blue-600 text-white transition shadow-sm";
-        btnFinanzas.className = "flex-1 py-3 text-xs font-bold rounded-xl text-sub hover:text-main transition shadow-sm";
-      }
-    };
-  </script>
+        <div class="flex items-center gap-3 pt-4 border-t" style="border-color: var(--border-color);">
+          <button type="button" onclick="cerrarDrawerNuevaCuenta()" class="flex-1 py-3 text-xs font-bold rounded-xl glass-card text-sub hover:text-main transition">Cancelar</button>
+          <button type="submit" class="flex-1 py-3 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition shadow-lg shadow-blue-600/30">
+            + Añadir cuenta
+          </button>
+        </div>
+      </form>
+    </div>
+  </aside>
 
-  <!-- Lógica Firebase & Curva Lineal Pro -->
+  <!-- MODAL: REGISTRAR PAYOUT -->
+  <div id="modal-payout" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 hidden">
+    <div class="glass-card w-full max-w-md p-6 rounded-2xl space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center pb-2 border-b" style="border-color: var(--border-color);">
+        <h3 class="text-base font-black text-main">Registrar Cobro / Payout</h3>
+        <button onclick="cerrarModalPayout()" class="text-sub hover:text-main">✕</button>
+      </div>
+
+      <form id="form-payout" class="space-y-4">
+        <div>
+          <label class="text-xs font-semibold text-sub block mb-1">Fecha de Cobro</label>
+          <input type="date" id="p-fecha" required class="w-full glass-input rounded-xl p-2.5 text-xs">
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-sub block mb-1">Firma / Prop Firm</label>
+          <input type="text" id="p-firma" placeholder="Ej. Lucid Trading" required class="w-full glass-input rounded-xl p-2.5 text-xs">
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-sub block mb-1">ID de Cuenta (opcional)</label>
+          <input type="text" id="p-cuenta-id" placeholder="Ej. LFE05082285050009" class="w-full glass-input rounded-xl p-2.5 text-xs font-mono">
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-sub block mb-1">Monto Neto Recibido ($ USD)</label>
+          <input type="number" step="0.01" id="p-monto" placeholder="Ej. 1500.00" required class="w-full glass-input rounded-xl p-2.5 text-xs font-mono">
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-sub block mb-1">Concepto / Notas</label>
+          <input type="text" id="p-concepto" placeholder="Ej. 1er Payout Lucid PA 50k" required class="w-full glass-input rounded-xl p-2.5 text-xs">
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="cerrarModalPayout()" class="flex-1 py-2.5 text-xs font-bold rounded-xl glass-card text-sub">Cancelar</button>
+          <button type="submit" class="flex-1 py-2.5 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/30">Guardar Payout</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT DE LOGICA Y FIREBASE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, get, set, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, get, set, onValue, push, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBgudUrsg-8whbcv0JnZgkVSh5cnihaQ9g",
@@ -609,23 +1053,266 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    let authMode = 'login'; 
     let currentUser = localStorage.getItem('prop_logged_user');
+    let authMode = 'login';
+    let isPrivacyMode = localStorage.getItem('prop_privacy_mode') === 'true';
+    let isSidebarCollapsed = localStorage.getItem('prop_sidebar_collapsed') === 'true';
+
+    // Manejo de Tema (Dark / Light Liquid Glass)
+    const sunSVG = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+    const moonSVG = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+
+    function aplicarTema(tema) {
+      document.documentElement.setAttribute('data-theme', tema);
+      localStorage.setItem('theme', tema);
+      const iconBox = document.getElementById('theme-icon-container');
+      if (iconBox) iconBox.innerHTML = tema === 'dark' ? sunSVG : moonSVG;
+    }
+
+    const temaInicial = localStorage.getItem('theme') || 'dark';
+    aplicarTema(temaInicial);
+
+    window.toggleTema = function() {
+      const actual = document.documentElement.getAttribute('data-theme') || 'dark';
+      const siguiente = actual === 'dark' ? 'light' : 'dark';
+      aplicarTema(siguiente);
+    };
+
+    // Control de Sidebar Contraíble
+    function aplicarEstadoSidebar() {
+      const sb = document.getElementById('main-sidebar');
+      const icon = document.getElementById('icon-sidebar-collapse');
+      const text = document.getElementById('sidebar-toggle-text');
+      if (isSidebarCollapsed) {
+        sb.classList.add('sidebar-collapsed');
+        icon.classList.add('rotate-180');
+        if (text) text.textContent = "Expandir";
+      } else {
+        sb.classList.remove('sidebar-collapsed');
+        icon.classList.remove('rotate-180');
+        if (text) text.textContent = "Contraer";
+      }
+    }
+    aplicarEstadoSidebar();
+
+    window.toggleSidebar = function() {
+      isSidebarCollapsed = !isSidebarCollapsed;
+      localStorage.setItem('prop_sidebar_collapsed', isSidebarCollapsed);
+      aplicarEstadoSidebar();
+    };
+
+    // Estado en memoria
+    let cuentasList = [];
+    let registrosList = [];
+    let journalList = [];
+
+    // Filtros
+    let filtroTiempo = 'todo'; // 'todo', '12m', '90d', '30d', o fecha específica 'YYYY-MM-DD'
+    let filtroEmpresaActiva = 'todas';
+    let modoBrutoNeto = 'neto';
+
+    // Calendario
+    let calFiltroTipo = 'neto';
+    let calFechaActual = new Date();
+
+    const hoyStr = new Date().toISOString().split('T')[0];
+    document.getElementById('nc-fecha').value = hoyStr;
+    document.getElementById('p-fecha').value = hoyStr;
+    document.getElementById('trade-fecha').value = hoyStr;
+
+    // Dropdown + Nuevo
+    window.toggleDropdownNuevo = function(e) {
+      e.stopPropagation();
+      const dd = document.getElementById('dropdown-nuevo');
+      dd.classList.toggle('hidden');
+    };
+
+    window.cerrarDropdownNuevo = function() {
+      const dd = document.getElementById('dropdown-nuevo');
+      if (dd) dd.classList.add('hidden');
+    };
+
+    window.cerrarDropdownsClickAfuera = function(e) {
+      if (!e.target.closest('#btn-nuevo-toggle') && !e.target.closest('#dropdown-nuevo')) {
+        cerrarDropdownNuevo();
+      }
+    };
+
+    // Filtros de Tiempo
+    window.cambiarFiltroTiempo = function(filtro) {
+      filtroTiempo = filtro;
+      ['todo', '12m', '90d', '30d'].forEach(f => {
+        const btn = document.getElementById(`tf-${f}`);
+        if (f === filtro) btn.className = "px-3.5 py-1.5 rounded-lg bg-blue-600 text-white transition shadow-sm";
+        else btn.className = "px-3 py-1.5 rounded-lg text-sub hover:text-main transition";
+      });
+      const lbl = document.getElementById('texto-filtro-fecha');
+      if (lbl) lbl.textContent = "Personalizado...";
+      const arrow = document.getElementById('arrow-filtro-fecha');
+      if (arrow) arrow.classList.remove('hidden');
+      const btnLimpiar = document.getElementById('btn-limpiar-fecha');
+      if (btnLimpiar) btnLimpiar.classList.add('hidden');
+      const contF = document.getElementById('tf-fecha-container');
+      if (contF) contF.className = "relative flex items-center px-3 py-1.5 rounded-lg text-sub hover:text-main cursor-pointer transition select-none";
+      const inputF = document.getElementById('tf-fecha-personalizada');
+      if (inputF) inputF.value = "";
+      actualizarTodo();
+    };
+
+    window.cambiarFiltroFechaPersonalizada = function(fechaVal) {
+      if (!fechaVal) return;
+      filtroTiempo = fechaVal; // Filtra por día específico YYYY-MM-DD
+      ['todo', '12m', '90d', '30d'].forEach(f => {
+        document.getElementById(`tf-${f}`).className = "px-3 py-1.5 rounded-lg text-sub hover:text-main transition";
+      });
+      
+      // Mostrar fecha formateada: ej. 18 nov 2026
+      try {
+        const partes = fechaVal.split('-');
+        if (partes.length === 3) {
+          const mesesNom = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+          const dia = parseInt(partes[2], 10);
+          const mes = mesesNom[parseInt(partes[1], 10) - 1] || partes[1];
+          const anio = partes[0];
+          document.getElementById('texto-filtro-fecha').textContent = `${dia} ${mes} ${anio}`;
+        } else {
+          document.getElementById('texto-filtro-fecha').textContent = fechaVal;
+        }
+      } catch(e) {
+        document.getElementById('texto-filtro-fecha').textContent = fechaVal;
+      }
+      
+      const contF = document.getElementById('tf-fecha-container');
+      if (contF) contF.className = "relative flex items-center px-3 py-1.5 rounded-lg bg-blue-600 text-white transition shadow-sm cursor-pointer select-none";
+      const arrow = document.getElementById('arrow-filtro-fecha');
+      if (arrow) arrow.classList.add('hidden');
+      const btnLimpiar = document.getElementById('btn-limpiar-fecha');
+      if (btnLimpiar) btnLimpiar.classList.remove('hidden');
+      actualizarTodo();
+    };
+
+    window.limpiarFiltroFechaPersonalizada = function(e) {
+      if (e) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+      cambiarFiltroTiempo('todo');
+    };
+
+    window.seleccionarFiltroEmpresa = function(emp) {
+      filtroEmpresaActiva = emp;
+      renderizarPillsEmpresas();
+      actualizarTodo();
+    };
+
+    function renderizarPillsEmpresas() {
+      const container = document.getElementById('firma-pills-container');
+      const btnTodas = document.getElementById('p-pill-todas');
+      
+      if (filtroEmpresaActiva === 'todas') {
+        btnTodas.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white transition shadow-sm";
+      } else {
+        btnTodas.className = "px-3 py-1.5 rounded-xl text-xs font-semibold glass-card text-sub hover:text-main transition";
+      }
+
+      const empresasSet = new Set();
+      cuentasList.forEach(c => { if(c.empresa) empresasSet.add(c.empresa); });
+      registrosList.forEach(r => { if(r.firma) empresasSet.add(r.firma); });
+
+      Array.from(container.children).forEach(child => {
+        if (child.id !== 'p-pill-todas') container.removeChild(child);
+      });
+
+      empresasSet.forEach(emp => {
+        const btn = document.createElement('button');
+        const isActive = filtroEmpresaActiva === emp;
+        btn.onclick = () => seleccionarFiltroEmpresa(emp);
+        btn.className = `flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm ${isActive ? 'bg-blue-600 text-white' : 'glass-card text-sub hover:text-main'}`;
+        btn.innerHTML = `<span class="w-2 h-2 rounded-full ${isActive ? 'bg-white' : 'bg-blue-500'}"></span> ${emp}`;
+        container.appendChild(btn);
+      });
+    }
+
+    window.cambiarModoBrutoNeto = function(modo) {
+      modoBrutoNeto = modo;
+      ['bruto', 'neto'].forEach(m => {
+        const btnMain = document.getElementById(`btn-bn-${m}-main`);
+        const btnSub = document.getElementById(`btn-bn-${m}-sub`);
+        if (m === modo) {
+          if (btnMain) btnMain.className = "px-2 py-0.5 rounded bg-blue-600 text-white transition";
+          if (btnSub) btnSub.className = "px-2 py-0.5 rounded bg-blue-600 text-white transition";
+        } else {
+          if (btnMain) btnMain.className = "px-2 py-0.5 rounded text-sub hover:text-main transition";
+          if (btnSub) btnSub.className = "px-2 py-0.5 rounded text-sub hover:text-main transition";
+        }
+      });
+      actualizarTodo();
+    };
+
+    window.toggleModoPrivacidad = function() {
+      isPrivacyMode = !isPrivacyMode;
+      localStorage.setItem('prop_privacy_mode', isPrivacyMode);
+      actualizarEstiloPrivacidad();
+    };
+
+    function actualizarEstiloPrivacidad() {
+      const container = document.getElementById('app-container');
+      const iconOpen = document.getElementById('icon-eye-open');
+      const iconClosed = document.getElementById('icon-eye-closed');
+
+      if (isPrivacyMode) {
+        container.classList.add('privacy-active');
+        iconOpen.classList.add('hidden');
+        iconClosed.classList.remove('hidden');
+      } else {
+        container.classList.remove('privacy-active');
+        iconOpen.classList.remove('hidden');
+        iconClosed.classList.add('hidden');
+      }
+    }
+    actualizarEstiloPrivacidad();
+
+    window.navegarA = function(vista) {
+      const vistas = ['panel', 'cuentas', 'payouts', 'analitica', 'estrategia', 'journal'];
+      vistas.forEach(v => {
+        const el = document.getElementById(`vista-${v}`);
+        const btn = document.getElementById(`nav-${v}`);
+        if (el) el.classList.add('hidden');
+        if (btn) btn.className = "sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-sub hover:text-main hover:bg-black/5 dark:hover:bg-white/5 transition";
+      });
+
+      const vistaActiva = document.getElementById(`vista-${vista}`);
+      const btnActivo = document.getElementById(`nav-${vista}`);
+      if (vistaActiva) vistaActiva.classList.remove('hidden');
+      if (btnActivo) btnActivo.className = "sidebar-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold bg-blue-600 text-white transition shadow-sm";
+
+      const titulos = {
+        panel: 'Panel General',
+        cuentas: 'Gestión de Cuentas',
+        payouts: 'Historial y Control de Payouts',
+        analitica: 'Analítica Global',
+        estrategia: 'Estrategia',
+        journal: 'Journal'
+      };
+      document.getElementById('header-view-title').textContent = titulos[vista] || 'Panel';
+
+      if (vista === 'panel') renderizarCalendario();
+      if (vista === 'estrategia') renderizarEstrategia();
+    };
 
     window.switchAuthTab = function(mode) {
       authMode = mode;
-      const tabLogin = document.getElementById('tab-login');
-      const tabRegister = document.getElementById('tab-register');
-      const btnSubmit = document.getElementById('btn-auth-submit');
-
+      const tabL = document.getElementById('tab-login');
+      const tabR = document.getElementById('tab-register');
+      const btnSub = document.getElementById('btn-auth-submit');
       if (mode === 'login') {
-        tabLogin.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white transition";
-        tabRegister.className = "flex-1 py-2 text-xs font-bold rounded-lg text-sub transition";
-        btnSubmit.textContent = "Entrar a mi Tracker";
+        tabL.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white transition";
+        tabR.className = "flex-1 py-2 text-xs font-bold rounded-lg text-sub hover:text-main transition";
+        btnSub.textContent = "Entrar a mi Panel";
       } else {
-        tabRegister.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white transition";
-        tabLogin.className = "flex-1 py-2 text-xs font-bold rounded-lg text-sub transition";
-        btnSubmit.textContent = "Registrar Cuenta Nueva";
+        tabR.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white transition";
+        tabL.className = "flex-1 py-2 text-xs font-bold rounded-lg text-sub hover:text-main transition";
+        btnSub.textContent = "Crear Cuenta Nueva";
       }
     };
 
@@ -637,431 +1324,1053 @@
     if (!currentUser) {
       document.getElementById('auth-modal').classList.remove('hidden');
     } else {
-      iniciarApp(currentUser);
+      iniciarSistema(currentUser);
     }
 
     document.getElementById('form-auth').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const usuarioInput = document.getElementById('auth-user').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_');
-      const passwordInput = document.getElementById('auth-pass').value;
+      const u = document.getElementById('auth-user').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_');
+      const p = document.getElementById('auth-pass').value;
 
-      if (!usuarioInput || !passwordInput) {
-        alert("Por favor completa todos los campos.");
-        return;
-      }
-
-      const userCredRef = ref(db, `credenciales/${usuarioInput}`);
-      const snapshot = await get(userCredRef);
+      const userRef = ref(db, `credenciales/${u}`);
+      const snap = await get(userRef);
 
       if (authMode === 'register') {
-        if (snapshot.exists()) {
-          alert("Este usuario ya existe. Por favor elige otro nombre o inicia sesión.");
+        if (snap.exists()) {
+          alert("El usuario ya existe. Elige otro.");
           return;
         }
-        await set(userCredRef, { password: passwordInput });
-        localStorage.setItem('prop_logged_user', usuarioInput);
-        alert("Cuenta creada con éxito.");
+        await set(userRef, { password: p });
+        localStorage.setItem('prop_logged_user', u);
         document.getElementById('auth-modal').classList.add('hidden');
-        iniciarApp(usuarioInput);
+        iniciarSistema(u);
       } else {
-        if (!snapshot.exists()) {
+        if (!snap.exists()) {
           alert("El usuario no existe. Regístrate primero.");
           return;
         }
-        const datosCred = snapshot.val();
-        if (datosCred.password !== passwordInput) {
+        if (snap.val().password !== p) {
           alert("Contraseña incorrecta.");
           return;
         }
-        localStorage.setItem('prop_logged_user', usuarioInput);
+        localStorage.setItem('prop_logged_user', u);
         document.getElementById('auth-modal').classList.add('hidden');
-        iniciarApp(usuarioInput);
+        iniciarSistema(u);
       }
     });
 
-    function iniciarApp(usuarioId) {
+    function iniciarSistema(usuarioId) {
       document.getElementById('app-container').classList.remove('hidden');
-      document.getElementById('display-usuario').textContent = usuarioId;
+      document.getElementById('display-sidebar-user').textContent = usuarioId;
 
-      const filtroPeriodoSelect = document.getElementById('filtro-periodo');
-      const filtroMesInput = document.getElementById('filtro-mes-especifico');
-      
-      const jFiltroPeriodo = document.getElementById('j-filtro-periodo');
-      const jFiltroMesInput = document.getElementById('j-filtro-mes-especifico');
-
+      const cuentasRef = ref(db, `usuarios/${usuarioId}/cuentas`);
       const registrosRef = ref(db, `usuarios/${usuarioId}/registros`);
       const journalRef = ref(db, `usuarios/${usuarioId}/journal`);
 
-      let currentRegistros = [];
-      let currentJournal = [];
-
-      window.actualizarVista = function() {
-        const registrosFiltrados = obtenerRegistrosFinanzasFiltrados(currentRegistros);
-        renderFinanzas(registrosFiltrados);
-
-        const journalFiltrados = obtenerJournalFiltrados(currentJournal);
-        renderJournal(journalFiltrados);
-      };
-
-      onValue(registrosRef, (snapshot) => {
-        const data = snapshot.val();
-        currentRegistros = [];
-        if (data) {
-          Object.keys(data).forEach(key => {
-            currentRegistros.push({ keyId: key, ...data[key] });
-          });
-        }
-        window.actualizarVista();
+      onValue(cuentasRef, (snap) => {
+        const data = snap.val();
+        cuentasList = [];
+        if (data) Object.keys(data).forEach(k => cuentasList.push({ idKey: k, ...data[k] }));
+        renderizarPillsEmpresas();
+        actualizarTodo();
       });
 
-      onValue(journalRef, (snapshot) => {
-        const data = snapshot.val();
-        currentJournal = [];
-        if (data) {
-          Object.keys(data).forEach(key => {
-            currentJournal.push({ keyId: key, ...data[key] });
-          });
-        }
-        window.actualizarVista();
+      onValue(registrosRef, (snap) => {
+        const data = snap.val();
+        registrosList = [];
+        if (data) Object.keys(data).forEach(k => registrosList.push({ idKey: k, ...data[k] }));
+        renderizarPillsEmpresas();
+        actualizarTodo();
       });
 
-      document.getElementById('tracker-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const tipo = document.getElementById('tipo').value;
-        const fecha = document.getElementById('fecha').value;
-        const firma = document.getElementById('firma').value;
-        const plataforma = document.getElementById('plataforma').value;
-        const tamano = document.getElementById('tamano').value;
-        const estado = document.getElementById('estado').value;
-        const concepto = document.getElementById('concepto').value;
-        const monto = parseFloat(document.getElementById('monto').value);
+      onValue(journalRef, (snap) => {
+        const data = snap.val();
+        journalList = [];
+        if (data) Object.keys(data).forEach(k => journalList.push({ idKey: k, ...data[k] }));
+        actualizarJournal();
+        renderizarEstrategia();
+      });
 
-        push(registrosRef, { tipo, fecha, firma, plataforma, tamano, estado, concepto, monto, timestamp: Date.now() })
-        .then(() => { 
-          document.getElementById('tracker-form').reset();
-          document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
-          document.getElementById('panel-formulario').removeAttribute('open');
+      window.seleccionarEmpresa = function(emp) {
+        document.querySelectorAll('.empresa-btn').forEach(btn => {
+          btn.classList.remove('border-blue-500', 'bg-blue-600/10');
         });
-      });
+        const selectedBtn = document.querySelector(`.empresa-btn[data-empresa="${emp}"]`);
+        if (selectedBtn) selectedBtn.classList.add('border-blue-500', 'bg-blue-600/10');
+        document.getElementById('nc-empresa-val').value = emp;
+      };
+      seleccionarEmpresa('Lucid');
 
-      document.getElementById('journal-form').addEventListener('submit', (e) => {
+      window.seleccionarTipoCuenta = function(tipo) {
+        const btnE = document.getElementById('btn-tipo-eval');
+        const btnF = document.getElementById('btn-tipo-fond');
+        if (tipo === 'Evaluación') {
+          btnE.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white transition";
+          btnF.className = "flex-1 py-2 text-xs font-bold rounded-lg text-sub hover:text-main transition";
+        } else {
+          btnF.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white transition";
+          btnE.className = "flex-1 py-2 text-xs font-bold rounded-lg text-sub hover:text-main transition";
+        }
+        document.getElementById('nc-tipo-val').value = tipo;
+      };
+
+      document.getElementById('form-nueva-cuenta').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const fecha = document.getElementById('j-fecha').value;
-        const sesion = document.getElementById('j-sesion').value;
-        const activo = document.getElementById('j-activo').value;
-        const direccion = document.getElementById('j-direccion').value;
-        const resultado = parseFloat(document.getElementById('j-resultado').value);
-        const psicologia = document.getElementById('j-psicologia').value;
-        const notas = document.getElementById('j-notas').value;
+        const empresa = document.getElementById('nc-empresa-val').value;
+        const tipo = document.getElementById('nc-tipo-val').value;
+        const cuentaId = document.getElementById('nc-id').value.trim();
+        const fecha = document.getElementById('nc-fecha').value;
+        const tamano = document.getElementById('nc-tamano').value;
+        const coste = parseFloat(document.getElementById('nc-coste').value);
 
-        push(journalRef, { fecha, sesion, activo, direccion, resultado, psicologia, notas, timestamp: Date.now() })
-        .then(() => { 
-          document.getElementById('journal-form').reset();
-          document.getElementById('j-fecha').value = new Date().toISOString().split('T')[0];
-          document.getElementById('panel-formulario-journal').removeAttribute('open');
+        await push(cuentasRef, {
+          empresa, tipo, cuentaId, fecha, tamano, coste,
+          estado: tipo === 'Evaluación' ? 'Evaluación' : 'Fondeada Sim',
+          payoutsAcumulados: 0,
+          timestamp: Date.now()
         });
+
+        await push(registrosRef, {
+          tipo: 'gasto', fecha, firma: empresa, plataforma: 'Tradovate', tamano,
+          estado: tipo, concepto: `Compra ${empresa} ${tamano} (${cuentaId})`,
+          monto: coste, timestamp: Date.now()
+        });
+
+        document.getElementById('form-nueva-cuenta').reset();
+        document.getElementById('nc-fecha').value = new Date().toISOString().split('T')[0];
+        cerrarDrawerNuevaCuenta();
       });
 
-      window.eliminarRegistro = function(keyId) {
-        if (confirm("¿Deseas borrar este registro financiero?")) {
-          remove(ref(db, `usuarios/${usuarioId}/registros/` + keyId));
+      document.getElementById('form-payout').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fecha = document.getElementById('p-fecha').value;
+        const firma = document.getElementById('p-firma').value.trim();
+        const cuentaId = document.getElementById('p-cuenta-id').value.trim();
+        const monto = parseFloat(document.getElementById('p-monto').value);
+        const concepto = document.getElementById('p-concepto').value.trim();
+
+        await push(registrosRef, {
+          tipo: 'payout', fecha, firma, cuentaId, concepto, monto, timestamp: Date.now()
+        });
+
+        if (cuentaId) {
+          const c = cuentasList.find(x => x.cuentaId === cuentaId);
+          if (c) {
+            await update(ref(db, `usuarios/${usuarioId}/cuentas/${c.idKey}`), {
+              payoutsAcumulados: (c.payoutsAcumulados || 0) + monto,
+              estado: 'Fondeada Live'
+            });
+          }
+        }
+
+        document.getElementById('form-payout').reset();
+        document.getElementById('p-fecha').value = new Date().toISOString().split('T')[0];
+        cerrarModalPayout();
+      });
+
+      document.getElementById('form-journal').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fecha = document.getElementById('trade-fecha').value;
+        const sesion = document.getElementById('trade-sesion').value;
+        const activo = document.getElementById('trade-activo').value;
+        const direccion = document.getElementById('trade-direccion').value;
+        const resultado = parseFloat(document.getElementById('trade-resultado').value);
+        const psicologia = document.getElementById('trade-psico').value;
+        const notas = document.getElementById('trade-notas').value;
+
+        await push(journalRef, {
+          fecha, sesion, activo, direccion, resultado, psicologia, notas, timestamp: Date.now()
+        });
+
+        document.getElementById('form-journal').reset();
+        document.getElementById('trade-fecha').value = new Date().toISOString().split('T')[0];
+        document.getElementById('panel-form-journal').classList.add('hidden');
+      });
+
+      window.cambiarEstadoCuenta = async function(idKey, nuevoEstado) {
+        await update(ref(db, `usuarios/${usuarioId}/cuentas/${idKey}`), { estado: nuevoEstado });
+      };
+
+      window.eliminarCuenta = async function(idKey) {
+        if (confirm("¿Deseas eliminar esta cuenta del tracker?")) {
+          await remove(ref(db, `usuarios/${usuarioId}/cuentas/${idKey}`));
         }
       };
 
-      window.eliminarJournal = function(keyId) {
-        if (confirm("¿Deseas borrar este trade de tu bitácora?")) {
-          remove(ref(db, `usuarios/${usuarioId}/journal/` + keyId));
+      window.eliminarTradeJournal = async function(idKey) {
+        if (confirm("¿Deseas borrar este trade?")) {
+          await remove(ref(db, `usuarios/${usuarioId}/journal/${idKey}`));
         }
       };
 
-      document.getElementById('btn-limpiar').addEventListener('click', () => {
-        if (confirm('¿Quieres vaciar completamente tus registros y tu journal?')) {
-          set(registrosRef, null);
-          set(journalRef, null);
+      window.eliminarRegistro = async function(idKey) {
+        if (confirm("¿Deseas eliminar este registro contable?")) {
+          await remove(ref(db, `usuarios/${usuarioId}/registros/${idKey}`));
         }
-      });
+      };
 
       document.getElementById('btn-exportar').addEventListener('click', () => {
-        const filtrados = obtenerRegistrosFinanzasFiltrados(currentRegistros);
-        let csv = "Fecha,Tipo_o_Sesion,Firma_o_Activo,Plataforma_o_Dir,Tamano_o_Psico,Estado_o_Notas,Concepto,Monto_USD\n";
-        filtrados.forEach(r => {
-          csv += `"${r.fecha || '-'}","${r.tipo}","${r.firma}","${r.plataforma}","${r.tamano}","${r.estado}","${r.concepto}","${r.monto}"\n`;
+        let csv = "Fecha,Tipo,Empresa_o_Activo,Detalle,Monto\n";
+        registrosList.forEach(r => {
+          csv += `"${r.fecha}","${r.tipo}","${r.firma || '-'}","${r.concepto || '-'}","${r.monto}"\n`;
         });
-        currentJournal.forEach(j => {
-          csv += `"${j.fecha}","TRADE_${j.sesion}","${j.activo}","${j.direccion}","${j.psicologia}","${j.notas}","Journal","${j.resultado}"\n`;
+        journalList.forEach(j => {
+          csv += `"${j.fecha}","TRADE_${j.sesion}","${j.activo}","${j.notas}","${j.resultado}"\n`;
         });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `PropTracker_Completo_${usuarioId}.csv`;
+        a.download = `PropTracker_EdwinJosney_${hoyStr}.csv`;
         a.click();
       });
-
-      filtroPeriodoSelect.addEventListener('change', () => {
-        if (filtroPeriodoSelect.value === 'mes_especifico') {
-          filtroMesInput.classList.remove('hidden');
-          if (!filtroMesInput.value) {
-            filtroMesInput.value = new Date().toISOString().slice(0, 7);
-          }
-        } else {
-          filtroMesInput.classList.add('hidden');
-        }
-        window.actualizarVista();
-      });
-      filtroMesInput.addEventListener('change', window.actualizarVista);
-
-      jFiltroPeriodo.addEventListener('change', () => {
-        if (jFiltroPeriodo.value === 'mes_especifico') {
-          jFiltroMesInput.classList.remove('hidden');
-          if (!jFiltroMesInput.value) {
-            jFiltroMesInput.value = new Date().toISOString().slice(0, 7);
-          }
-        } else {
-          jFiltroMesInput.classList.add('hidden');
-        }
-        window.actualizarVista();
-      });
-      jFiltroMesInput.addEventListener('change', window.actualizarVista);
-
-      function filtrarPorPeriodoGenerico(lista, selectorPeriodo, selectorMesEsp) {
-        const periodo = selectorPeriodo.value;
-        const mesEspecificoVal = selectorMesEsp.value;
-        const ahora = new Date();
-        const anioActual = ahora.getFullYear();
-        const mesActual = ahora.getMonth();
-
-        return lista.filter(item => {
-          if (periodo === 'todos') return true;
-          if (!item.fecha) return true;
-          const partes = item.fecha.split('-');
-          const rAnio = parseInt(partes[0]);
-          const rMes = parseInt(partes[1]) - 1;
-
-          if (periodo === 'mes_actual') return rAnio === anioActual && rMes === mesActual;
-          if (periodo === 'mes_anterior') {
-            const mesAnterior = mesActual === 0 ? 11 : mesActual - 1;
-            const anioMesAnterior = mesActual === 0 ? anioActual - 1 : anioActual;
-            return rAnio === anioMesAnterior && rMes === mesAnterior;
-          }
-          if (periodo === 'ytd') return rAnio === anioActual;
-          if (periodo === 'mes_especifico' && mesEspecificoVal) {
-            const [eAnio, eMes] = mesEspecificoVal.split('-').map(Number);
-            return rAnio === eAnio && rMes === (eMes - 1);
-          }
-          return true;
-        });
-      }
-
-      function obtenerRegistrosFinanzasFiltrados(registros) {
-        return filtrarPorPeriodoGenerico(registros, filtroPeriodoSelect, filtroMesInput);
-      }
-
-      function obtenerJournalFiltrados(journal) {
-        return filtrarPorPeriodoGenerico(journal, jFiltroPeriodo, jFiltroMesInput);
-      }
-
-      function renderFinanzas(registros) {
-        const tabla = document.getElementById('tabla-registros');
-        tabla.innerHTML = '';
-        let inversionTotal = 0;
-        let payoutsTotales = 0;
-
-        registros.sort((a, b) => new Date(b.fecha || b.timestamp) - new Date(a.fecha || a.timestamp));
-
-        registros.forEach(r => {
-          if (r.tipo === 'gasto') inversionTotal += Number(r.monto || 0);
-          if (r.tipo === 'payout') payoutsTotales += Number(r.monto || 0);
-
-          let estadoColor = "bg-slate-500/10 text-sub border border-slate-500/20";
-          if (r.estado === 'Fondeada Sim') estadoColor = "bg-blue-500/10 text-blue-400 border border-blue-500/30";
-          if (r.estado === 'Fondeada Live') estadoColor = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
-          if (r.estado === 'Quemada') estadoColor = "bg-red-500/10 text-red-400 border border-red-500/30";
-          if (r.estado === 'Evaluación') estadoColor = "bg-amber-500/10 text-amber-400 border border-amber-500/30";
-
-          const tr = document.createElement('tr');
-          tr.className = 'prop-table-row';
-          tr.innerHTML = `
-            <td class="p-3.5 text-xs text-sub font-mono">${r.fecha || 'S/F'}</td>
-            <td class="p-3.5"><span class="px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase ${r.tipo === 'gasto' ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'}">${r.tipo === 'gasto' ? 'GASTO' : 'PAYOUT'}</span></td>
-            <td class="p-3.5 font-semibold text-main">${r.firma || '-'}</td>
-            <td class="p-3.5 text-sub">${r.plataforma || '-'}</td>
-            <td class="p-3.5 text-sub">${r.tamano || '-'}</td>
-            <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[11px] font-medium ${estadoColor}">${r.estado || 'N/A'}</span></td>
-            <td class="p-3.5 text-main">${r.concepto || '-'}</td>
-            <td class="p-3.5 text-right font-mono font-bold ${r.tipo === 'gasto' ? 'text-red-500' : 'text-emerald-400'}">${r.tipo === 'gasto' ? '-' : '+'}$${Number(r.monto || 0).toFixed(2)}</td>
-            <td class="p-3.5 text-center"><button onclick="eliminarRegistro('${r.keyId}')" class="text-sub hover:text-red-400 text-sm transition">✕</button></td>
-          `;
-          tabla.appendChild(tr);
-        });
-
-        const pnl = payoutsTotales - inversionTotal;
-        const roi = inversionTotal > 0 ? ((pnl / inversionTotal) * 100).toFixed(1) : '0.0';
-        const ratio = inversionTotal > 0 ? (payoutsTotales / inversionTotal).toFixed(2) : (payoutsTotales > 0 ? '∞' : '0.0');
-
-        document.getElementById('kpi-inversion').textContent = `$${inversionTotal.toFixed(2)}`;
-        document.getElementById('kpi-payouts').textContent = `$${payoutsTotales.toFixed(2)}`;
-        
-        const pnlEl = document.getElementById('kpi-pnl');
-        pnlEl.textContent = `$${pnl.toFixed(2)}`;
-        pnlEl.className = `text-3xl font-black ${pnl >= 0 ? 'text-emerald-400' : 'text-red-500'}`;
-
-        const cardPnlLarge = document.getElementById('card-pnl-large');
-        cardPnlLarge.textContent = `$${pnl.toFixed(2)}`;
-        cardPnlLarge.className = `text-4xl font-black ${pnl >= 0 ? 'text-emerald-400' : 'text-red-500'}`;
-
-        document.getElementById('kpi-roi').textContent = `${roi}%`;
-        document.getElementById('ratio-eficiencia').textContent = `${ratio}x`;
-        document.getElementById('progress-bar').style.width = `${inversionTotal > 0 ? Math.min(Math.max((payoutsTotales / inversionTotal) * 50, 5), 100) : (payoutsTotales > 0 ? 100 : 0)}%`;
-        document.getElementById('contador-registros').textContent = `${registros.length} Registros Mostrados`;
-      }
-
-      function renderJournal(journalList) {
-        const tablaJ = document.getElementById('tabla-journal');
-        tablaJ.innerHTML = '';
-
-        let journalPnl = 0;
-        let gananciasBrutas = 0;
-        let perdidasBrutas = 0;
-        let ganados = 0;
-
-        // Orden cronológico para la curva de equidad
-        journalList.sort((a, b) => new Date(a.fecha || a.timestamp) - new Date(b.fecha || b.timestamp));
-
-        let acumulado = 0;
-        let puntosCurva = [];
-
-        journalList.forEach(j => {
-          const res = Number(j.resultado || 0);
-          journalPnl += res;
-          acumulado += res;
-          puntosCurva.push({ fecha: j.fecha, activo: j.activo, resultado: res, acumulado: acumulado });
-
-          if (res > 0) {
-            gananciasBrutas += res;
-            ganados++;
-          } else {
-            perdidasBrutas += Math.abs(res);
-          }
-        });
-
-        let profitFactor = 0.00;
-        if (perdidasBrutas > 0) {
-          profitFactor = gananciasBrutas / perdidasBrutas;
-        } else if (gananciasBrutas > 0) {
-          profitFactor = gananciasBrutas;
-        }
-
-        // Renderizar Gráfica SVG Lineal Pro
-        const svgG = document.getElementById('svg-elements');
-        const tooltip = document.getElementById('tooltip-grafica');
-        svgG.innerHTML = '';
-
-        if (puntosCurva.length === 0) {
-          document.getElementById('badge-pf-estado').textContent = "Sin datos en periodo";
-          svgG.innerHTML = `<text x="400" y="100" fill="#94A3B8" font-size="12" text-anchor="middle">No hay trades en este periodo para graficar</text>`;
-        } else {
-          document.getElementById('badge-pf-estado').textContent = profitFactor >= 1.5 ? "🔥 Excelente Rendimiento" : (profitFactor >= 1 ? "📈 Rentable" : "⚠️ En Zona de Riesgo");
-
-          const minVal = Math.min(0, ...puntosCurva.map(p => p.acumulado));
-          const maxVal = Math.max(...puntosCurva.map(p => p.acumulado), minVal + 10);
-          const rango = maxVal - minVal || 1;
-
-          const width = 800;
-          const height = 200;
-          const stepX = puntosCurva.length > 1 ? width / (puntosCurva.length - 1) : width / 2;
-
-          let coords = puntosCurva.map((p, idx) => {
-            const cx = puntosCurva.length === 1 ? width / 2 : idx * stepX;
-            const cy = height - ((p.acumulado - minVal) / rango) * (height - 30) - 15;
-            return { cx, cy, data: p };
-          });
-
-          // Crear polígono de área con gradiente
-          let dArea = `M ${coords[0].cx} ${height} `;
-          coords.forEach(c => { dArea += `L ${c.cx} ${c.cy} `; });
-          dArea += `L ${coords[coords.length - 1].cx} ${height} Z`;
-
-          const pathArea = document.createElementNS("http://www.w3.org/2000/svg", "path");
-          pathArea.setAttribute("d", dArea);
-          pathArea.setAttribute("fill", "url(#equity-gradient)");
-          svgG.appendChild(pathArea);
-
-          // Crear línea principal de equidad
-          let dLine = `M ${coords[0].cx} ${coords[0].cy} `;
-          coords.forEach(c => { dLine += `L ${c.cx} ${c.cy} `; });
-
-          const pathLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
-          pathLine.setAttribute("d", dLine);
-          pathLine.setAttribute("fill", "none");
-          pathLine.setAttribute("stroke", "#3B82F6");
-          pathLine.setAttribute("stroke-width", "3");
-          pathLine.setAttribute("stroke-linecap", "round");
-          pathLine.setAttribute("stroke-linejoin", "round");
-          svgG.appendChild(pathLine);
-
-          // Puntos interactivos y hover
-          coords.forEach(c => {
-            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-            circle.setAttribute("cx", c.cx);
-            circle.setAttribute("cy", c.cy);
-            circle.setAttribute("r", "5");
-            circle.setAttribute("fill", c.data.resultado >= 0 ? "#10B981" : "#EF4444");
-            circle.setAttribute("stroke", "#121620");
-            circle.setAttribute("stroke-width", "2");
-            circle.style.cursor = "pointer";
-
-            circle.addEventListener('mouseenter', () => {
-              tooltip.innerHTML = `<strong>${c.data.fecha} (${c.data.activo})</strong><br/>Trade: ${c.data.resultado >= 0 ? '+' : ''}$${c.data.resultado.toFixed(2)}<br/><span class="text-blue-400">Acumulado: $${c.data.acumulado.toFixed(2)}</span>`;
-              tooltip.classList.remove('hidden');
-            });
-            circle.addEventListener('mouseleave', () => {
-              tooltip.classList.add('hidden');
-            });
-
-            svgG.appendChild(circle);
-          });
-        }
-
-        const winRate = journalList.length > 0 ? ((ganados / journalList.length) * 100).toFixed(1) : '0.0';
-
-        const pfEl = document.getElementById('journal-profit-factor');
-        pfEl.textContent = profitFactor.toFixed(2);
-        pfEl.className = `text-3xl font-black ${profitFactor >= 1.5 ? 'text-emerald-400' : (profitFactor >= 1 ? 'text-blue-400' : 'text-red-500')}`;
-
-        const jPnlEl = document.getElementById('journal-pnl');
-        jPnlEl.textContent = `$${journalPnl.toFixed(2)}`;
-        jPnlEl.className = `text-3xl font-black ${journalPnl >= 0 ? 'text-emerald-400' : 'text-red-500'}`;
-
-        document.getElementById('journal-winrate').textContent = `${winRate}%`;
-        document.getElementById('journal-total-trades').textContent = journalList.length;
-        document.getElementById('contador-journal').textContent = `${journalList.length} Trades Registrados`;
-
-        // Invertir para mostrar el más reciente arriba en la tabla
-        journalList.reverse();
-        
-        journalList.forEach(j => {
-          const res = Number(j.resultado || 0);
-          let psicoColor = "bg-blue-500/10 text-blue-400 border border-blue-500/30";
-          if (j.psicologia && j.psicologia.includes("Venganza")) psicoColor = "bg-red-500/10 text-red-400 border border-red-500/30";
-          if (j.psicologia && j.psicologia.includes("FOMO")) psicoColor = "bg-amber-500/10 text-amber-400 border border-amber-500/30";
-
-          const tr = document.createElement('tr');
-          tr.className = 'prop-table-row';
-          tr.innerHTML = `
-            <td class="p-3.5 text-xs text-sub font-mono">${j.fecha || 'S/F'}</td>
-            <td class="p-3.5 text-xs text-sub font-semibold">${j.sesion || '-'}</td>
-            <td class="p-3.5 font-bold text-blue-400">${j.activo || '-'}</td>
-            <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${j.direccion.includes('Compra') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-blue-500/10 text-blue-400 border border-blue-500/30'}">${j.direccion}</span></td>
-            <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[11px] font-medium ${psicoColor}">${j.psicologia || 'Normal'}</span></td>
-            <td class="p-3.5 text-sub text-xs">${j.notas || '-'}</td>
-            <td class="p-3.5 text-right font-mono font-bold ${res >= 0 ? 'text-emerald-400' : 'text-red-500'}">${res >= 0 ? '+' : ''}$${res.toFixed(2)}</td>
-            <td class="p-3.5 text-center"><button onclick="eliminarJournal('${j.keyId}')" class="text-sub hover:text-red-400 text-sm transition">✕</button></td>
-          `;
-          tablaJ.appendChild(tr);
-        });
-      }
     }
+
+    function obtenerRegistrosFiltrados() {
+      const ahora = new Date();
+      return registrosList.filter(r => {
+        if (filtroEmpresaActiva !== 'todas') {
+          if ((r.firma || '').toLowerCase() !== filtroEmpresaActiva.toLowerCase()) return false;
+        }
+
+        if (!r.fecha) return true;
+        const f = new Date(r.fecha);
+        const diffDias = (ahora - f) / (1000 * 60 * 60 * 24);
+
+        if (filtroTiempo === '30d') return diffDias <= 30;
+        if (filtroTiempo === '90d') return diffDias <= 90;
+        if (filtroTiempo === '12m') return diffDias <= 365;
+        if (filtroTiempo.includes('-')) {
+          return r.fecha.startsWith(filtroTiempo); // Fecha exacta YYYY-MM-DD o mes YYYY-MM
+        }
+        return true;
+      });
+    }
+
+    function obtenerCuentasFiltradas() {
+      return cuentasList.filter(c => {
+        if (filtroEmpresaActiva !== 'todas') {
+          if ((c.empresa || '').toLowerCase() !== filtroEmpresaActiva.toLowerCase()) return false;
+        }
+        return true;
+      });
+    }
+
+    function actualizarTodo() {
+      const regs = obtenerRegistrosFiltrados();
+      const cuentas = obtenerCuentasFiltradas();
+
+      let totalInvertido = 0;
+      let totalPayouts = 0;
+
+      regs.forEach(r => {
+        const m = Number(r.monto || 0);
+        if (r.tipo === 'gasto') totalInvertido += m;
+        if (r.tipo === 'payout') totalPayouts += m;
+      });
+
+      const pnlNeto = totalPayouts - totalInvertido;
+      const roi = totalInvertido > 0 ? ((pnlNeto / totalInvertido) * 100).toFixed(1) : '0.0';
+
+      const kpiPayoutsMain = document.getElementById('kpi-panel-payouts-main');
+      kpiPayoutsMain.textContent = `$${totalPayouts.toFixed(2)}`;
+
+      const kpiNeto = document.getElementById('kpi-panel-neto');
+      kpiNeto.textContent = `${pnlNeto >= 0 ? '+' : ''}$${pnlNeto.toFixed(2)}`;
+      kpiNeto.className = `text-3xl font-black font-mono privacy-blur ${pnlNeto >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+
+      const roiEl = document.getElementById('kpi-panel-roi');
+      roiEl.textContent = `${roi >= 0 ? '↑' : '↓'} ${Math.abs(roi)}% ROI`;
+      roiEl.className = `text-xs font-bold ${roi >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+
+      const totalPayoutsCount = registrosList.filter(r => r.tipo === 'payout').length;
+      document.getElementById('badge-payouts-subtitle').textContent = `${regs.filter(r => r.tipo === 'payout').length} payouts · $${totalPayouts.toFixed(2)} netos tras el reparto`;
+      document.getElementById('badge-payouts-count').textContent = totalPayoutsCount;
+      document.getElementById('kpi-panel-invertido').textContent = `$${totalInvertido.toFixed(2)}`;
+      document.getElementById('kpi-panel-cobrado-resumen').textContent = `$${totalPayouts.toFixed(2)}`;
+
+      const cuentasActivas = cuentas.filter(c => c.estado !== 'Quemada').length;
+      document.getElementById('kpi-panel-cuentas-info').textContent = `${cuentas.length} cuentas · ${cuentasActivas} activas`;
+      document.getElementById('badge-cuentas-count').textContent = cuentasActivas;
+
+      const decididas = cuentas.filter(c => c.estado === 'Quemada' || c.estado === 'Fondeada Sim' || c.estado === 'Fondeada Live').length;
+      const aprobadas = cuentas.filter(c => c.estado === 'Fondeada Sim' || c.estado === 'Fondeada Live').length;
+      const fundingRatio = decididas > 0 ? ((aprobadas / decididas) * 100).toFixed(1) : '0.0';
+      
+      document.getElementById('kpi-funding-ratio').textContent = `${fundingRatio}%`;
+      document.getElementById('circle-ratio-label').textContent = `${Math.round(fundingRatio)}%`;
+      document.getElementById('circle-progress').setAttribute('stroke-dasharray', `${Math.min(Math.round(fundingRatio), 100)}, 100`);
+      document.getElementById('kpi-funding-desc').textContent = `${aprobadas} de ${decididas} evaluaciones decididas`;
+
+      renderizarMiniCurvaMultiLinea(regs);
+      renderizarCalendario();
+      renderizarPorEmpresa();
+      renderizarTarjetasCuentas();
+      renderizarTablaPayouts();
+
+      const ratioEf = totalInvertido > 0 ? (totalPayouts / totalInvertido).toFixed(2) : (totalPayouts > 0 ? '∞' : '0.0');
+      document.getElementById('an-ratio-eficiencia').textContent = `${ratioEf}x`;
+      const costoPa = aprobadas > 0 ? (totalInvertido / aprobadas).toFixed(2) : totalInvertido.toFixed(2);
+      document.getElementById('an-costo-promedio-pa').textContent = `$${costoPa}`;
+      document.getElementById('an-tasa-exito').textContent = `${fundingRatio}%`;
+    }
+
+    function renderizarMiniCurvaMultiLinea(regs) {
+      const lineBen = document.getElementById('svg-line-beneficio');
+      const lineGas = document.getElementById('svg-line-gastos');
+      const lineCob = document.getElementById('svg-line-cobrado');
+      const area = document.getElementById('svg-mini-area');
+      const pointsG = document.getElementById('svg-multi-points');
+      const tooltip = document.getElementById('chart-multi-tooltip');
+      pointsG.innerHTML = '';
+
+      const filtered = regs || obtenerRegistrosFiltrados();
+      const movs = [...filtered].sort((a,b) => new Date(a.fecha || a.timestamp) - new Date(b.fecha || b.timestamp));
+
+      if (movs.length === 0) {
+        lineBen.setAttribute('d', 'M 0 45 L 400 45');
+        lineGas.setAttribute('d', 'M 0 45 L 400 45');
+        lineCob.setAttribute('d', 'M 0 45 L 400 45');
+        area.setAttribute('d', 'M 0 45 L 400 45 L 400 90 L 0 90 Z');
+        return;
+      }
+
+      let acumBen = 0, acumCob = 0, acumGas = 0;
+      let puntos = [{ fecha: movs[0].fecha || 'Inicio', ben: 0, cob: 0, gas: 0 }];
+
+      movs.forEach(m => {
+        const val = Number(m.monto || 0);
+        if (m.tipo === 'payout') {
+          acumCob += val;
+          acumBen += val;
+        } else {
+          acumGas += val;
+          acumBen -= val;
+        }
+        puntos.push({ fecha: m.fecha || '', ben: acumBen, cob: acumCob, gas: acumGas });
+      });
+
+      const todosValores = puntos.flatMap(p => [p.ben, p.cob, -p.gas]);
+      const min = Math.min(0, ...todosValores);
+      const max = Math.max(10, ...todosValores);
+      const range = max - min || 1;
+
+      const w = 400;
+      const h = 90;
+      const step = puntos.length > 1 ? w / (puntos.length - 1) : w;
+
+      const getY = (val) => h - ((val - min) / range) * (h - 24) - 12;
+
+      let dBen = `M 0 ${getY(puntos[0].ben)} `;
+      let dCob = `M 0 ${getY(puntos[0].cob)} `;
+      let dGas = `M 0 ${getY(puntos[0].gas)} `;
+      let dArea = dBen;
+
+      puntos.forEach((p, idx) => {
+        const cx = idx * step;
+        const cyBen = getY(p.ben);
+        const cyCob = getY(p.cob);
+        const cyGas = getY(p.gas);
+
+        if (idx > 0) {
+          dBen += `L ${cx} ${cyBen} `;
+          dCob += `L ${cx} ${cyCob} `;
+          dGas += `L ${cx} ${cyGas} `;
+          dArea += `L ${cx} ${cyBen} `;
+        }
+
+        const hitCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        hitCircle.setAttribute("cx", cx);
+        hitCircle.setAttribute("cy", cyBen);
+        hitCircle.setAttribute("r", "12");
+        hitCircle.setAttribute("fill", "transparent");
+        hitCircle.style.cursor = "pointer";
+
+        hitCircle.addEventListener('mouseenter', () => {
+          document.getElementById('tooltip-date').textContent = p.fecha || 'Sin fecha';
+          document.getElementById('tooltip-gastos').textContent = `$${p.gas.toFixed(2)}`;
+          document.getElementById('tooltip-cobrado').textContent = `$${p.cob.toFixed(2)}`;
+          document.getElementById('tooltip-beneficio').textContent = `${p.ben >= 0 ? '+' : ''}$${p.ben.toFixed(2)}`;
+          tooltip.classList.remove('hidden');
+        });
+
+        hitCircle.addEventListener('mouseleave', () => {
+          tooltip.classList.add('hidden');
+        });
+
+        pointsG.appendChild(hitCircle);
+      });
+
+      dArea += `L ${w} ${h} L 0 ${h} Z`;
+      lineBen.setAttribute('d', dBen);
+      lineCob.setAttribute('d', dCob);
+      lineGas.setAttribute('d', dGas);
+      area.setAttribute('d', dArea);
+    }
+
+    function renderizarEstrategia() {
+      const decididas = cuentasList.filter(c => c.estado === 'Quemada' || c.estado.includes('Fondeada')).length;
+      const aprobadas = cuentasList.filter(c => c.estado.includes('Fondeada')).length;
+      const approvalRate = decididas > 0 ? Math.round((aprobadas / decididas) * 100) : 43;
+
+      document.getElementById('st-big-approval-rate').textContent = `${approvalRate}%`;
+      document.getElementById('st-detail-counts').textContent = `${aprobadas} de ${decididas || 1}`;
+
+      let ganadas = 0, totalOps = journalList.length;
+      let totalRes = 0;
+      journalList.forEach(j => {
+        const r = Number(j.resultado || 0);
+        totalRes += r;
+        if (r > 0) ganadas++;
+      });
+      const perdidas = totalOps - ganadas;
+      const wr = totalOps > 0 ? ((ganadas / totalOps) * 100).toFixed(1) : '66.0';
+
+      document.getElementById('st-winrate').textContent = `${wr} %`;
+      document.getElementById('st-total-ops').textContent = totalOps || '0';
+      document.getElementById('st-ops-sub').textContent = `${ganadas} ganadas y ${perdidas} perdidas en bitácora`;
+      
+      const resAcumEl = document.getElementById('st-resultado-acum');
+      resAcumEl.textContent = `${totalRes >= 0 ? '+' : ''}$${totalRes.toFixed(2)}`;
+      resAcumEl.className = `text-3xl font-black font-mono privacy-blur ${totalRes >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+
+      const dotsContainer = document.getElementById('st-dots-matrix');
+      dotsContainer.innerHTML = '';
+      
+      const ultimos20 = [...journalList].slice(-20);
+      let ganadas20 = 0;
+
+      for (let i = 0; i < 20; i++) {
+        const dot = document.createElement('div');
+        dot.className = "w-3 h-3 rounded-full transition";
+        if (i < ultimos20.length) {
+          const res = Number(ultimos20[i].resultado || 0);
+          if (res > 0) {
+            dot.className += " bg-emerald-500 shadow-sm shadow-emerald-500/50";
+            ganadas20++;
+          } else {
+            dot.className += " bg-rose-500 shadow-sm shadow-rose-500/50";
+          }
+        } else {
+          const demoWin = (i % 3 !== 0);
+          dot.className += demoWin ? " bg-emerald-500/80" : " bg-rose-500/80";
+          if (demoWin) ganadas20++;
+        }
+        dotsContainer.appendChild(dot);
+      }
+      document.getElementById('st-ultimas-ganadas').textContent = `${ganadas20} ganadas`;
+
+      const sLine = document.getElementById('svg-strat-line');
+      const sArea = document.getElementById('svg-strat-area');
+      let acum = 0;
+      let sPuntos = [0];
+      journalList.forEach(j => {
+        acum += Number(j.resultado || 0);
+        sPuntos.push(acum);
+      });
+      if (sPuntos.length <= 1) sPuntos = [0, 1500, 3200, 2800, 4500, 6200, 5800, 7500, 8900];
+
+      const sMin = Math.min(...sPuntos);
+      const sMax = Math.max(...sPuntos);
+      const sRange = sMax - sMin || 1;
+      const sW = 500, sH = 150;
+      const sStep = sW / (sPuntos.length - 1);
+
+      let dSLine = `M 0 ${sH - ((sPuntos[0] - sMin) / sRange) * (sH - 30) - 15} `;
+      let dSArea = dSLine;
+
+      sPuntos.forEach((val, idx) => {
+        const cx = idx * sStep;
+        const cy = sH - ((val - sMin) / sRange) * (sH - 30) - 15;
+        if (idx > 0) {
+          dSLine += `L ${cx} ${cy} `;
+          dSArea += `L ${cx} ${cy} `;
+        }
+      });
+      dSArea += `L ${sW} ${sH} L 0 ${sH} Z`;
+      sLine.setAttribute('d', dSLine);
+      sArea.setAttribute('d', dSArea);
+
+      const barsG = document.getElementById('svg-bars-container');
+      barsG.innerHTML = '';
+      const demoSemanas = [
+        { semana: '1', val: 1200 },
+        { semana: '2', val: 850 },
+        { semana: '3', val: 2400 },
+        { semana: '4', val: 1600 },
+        { semana: '5', val: -1300 },
+        { semana: '6', val: 950 },
+        { semana: '7', val: 1800 }
+      ];
+
+      const maxAbs = Math.max(...demoSemanas.map(s => Math.abs(s.val)), 2500);
+      const barWidth = 24;
+      const spacing = 500 / demoSemanas.length;
+
+      demoSemanas.forEach((sem, idx) => {
+        const cx = idx * spacing + (spacing - barWidth) / 2;
+        const barH = (Math.abs(sem.val) / maxAbs) * 60;
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", cx);
+        rect.setAttribute("width", barWidth);
+        rect.setAttribute("rx", "4");
+
+        if (sem.val >= 0) {
+          rect.setAttribute("y", 75 - barH);
+          rect.setAttribute("height", barH);
+          rect.setAttribute("fill", "#10B981");
+        } else {
+          rect.setAttribute("y", 75);
+          rect.setAttribute("height", barH);
+          rect.setAttribute("fill", "#F43F5E");
+        }
+        barsG.appendChild(rect);
+      });
+    }
+
+    // CALENDARIO
+    window.cambiarFiltroCal = function(filtro) {
+      calFiltroTipo = filtro;
+      ['payouts', 'gastos', 'neto'].forEach(f => {
+        const b = document.getElementById(`cal-filter-${f}`);
+        if (f === filtro) b.className = "px-3 py-1.5 rounded-lg bg-blue-600 text-white transition shadow-sm";
+        else b.className = "px-3 py-1.5 rounded-lg text-sub hover:text-main transition";
+      });
+      renderizarCalendario();
+    };
+
+    window.navegarMes = function(offset) {
+      calFechaActual.setMonth(calFechaActual.getMonth() + offset);
+      renderizarCalendario();
+    };
+
+    window.navegarAnio = function(offset) {
+      calFechaActual.setFullYear(calFechaActual.getFullYear() + offset);
+      renderizarCalendario();
+    };
+
+    window.irAMesActual = function() {
+      calFechaActual = new Date();
+      renderizarCalendario();
+    };
+
+    function renderizarCalendario() {
+      const anio = calFechaActual.getFullYear();
+      const mes = calFechaActual.getMonth();
+
+      const nombresMeses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      document.getElementById('cal-mes-nombre').textContent = `${nombresMeses[mes]} ${anio}`;
+      document.getElementById('cal-anio-label').textContent = anio;
+
+      const primerDia = new Date(anio, mes, 1);
+      const ultimoDia = new Date(anio, mes + 1, 0);
+      const totalDias = ultimoDia.getDate();
+      
+      let diaSemanaInicio = primerDia.getDay() - 1;
+      if (diaSemanaInicio === -1) diaSemanaInicio = 6;
+
+      const gridEl = document.getElementById('cal-dias-grid');
+      gridEl.innerHTML = '';
+
+      let totalMesNeto = 0;
+      let totalMesGastos = 0;
+      let totalMesPayouts = 0;
+      let diaContador = 1;
+
+      for (let s = 0; s < 6; s++) {
+        let semanaDias = [];
+        let totalSemanaNeto = 0;
+
+        for (let col = 0; col < 6; col++) {
+          if ((s === 0 && col < diaSemanaInicio && col !== 5) || diaContador > totalDias) {
+            semanaDias.push(null);
+          } else {
+            if (col === 5) {
+              const diaSab = diaContador <= totalDias ? diaContador++ : null;
+              const diaDom = diaContador <= totalDias ? diaContador++ : null;
+              semanaDias.push({ tipo: 'fin_de_semana', sab: diaSab, dom: diaDom });
+            } else {
+              semanaDias.push({ tipo: 'laboral', dia: diaContador++ });
+            }
+          }
+        }
+
+        if (semanaDias.some(d => d !== null)) {
+          semanaDias.forEach(celda => {
+            if (!celda) {
+              const empty = document.createElement('div');
+              empty.className = "h-20 rounded-xl glass-card opacity-20";
+              gridEl.appendChild(empty);
+            } else if (celda.tipo === 'laboral') {
+              const diaNum = celda.dia;
+              const fStr = `${anio}-${String(mes + 1).padStart(2, '0')}-${String(diaNum).padStart(2, '0')}`;
+              
+              const movsDia = registrosList.filter(r => {
+                if (r.fecha !== fStr) return false;
+                if (filtroEmpresaActiva !== 'todas') {
+                  return (r.firma || '').toLowerCase() === filtroEmpresaActiva.toLowerCase();
+                }
+                return true;
+              });
+
+              let gDia = 0, pDia = 0;
+              movsDia.forEach(m => {
+                if (m.tipo === 'gasto') gDia += Number(m.monto || 0);
+                if (m.tipo === 'payout') pDia += Number(m.monto || 0);
+              });
+              const netoDia = pDia - gDia;
+
+              totalMesNeto += netoDia;
+              totalMesGastos += gDia;
+              totalMesPayouts += pDia;
+              totalSemanaNeto += netoDia;
+
+              let mostrarVal = 0;
+              if (calFiltroTipo === 'neto') mostrarVal = netoDia;
+              if (calFiltroTipo === 'gastos') mostrarVal = gDia;
+              if (calFiltroTipo === 'payouts') mostrarVal = pDia;
+
+              const div = document.createElement('div');
+              let borderClass = "glass-card";
+              if (movsDia.length > 0) {
+                if (netoDia < 0) borderClass = "border-rose-500/40 bg-rose-500/10";
+                if (netoDia > 0) borderClass = "border-emerald-500/40 bg-emerald-500/10";
+              }
+
+              div.className = `h-20 rounded-xl p-2 flex flex-col justify-between transition hover:border-blue-500/50 cursor-pointer ${borderClass}`;
+              div.title = `Filtrar dashboard por el día ${fStr}`;
+              div.onclick = () => cambiarFiltroFechaPersonalizada(fStr);
+              div.innerHTML = `
+                <div class="flex justify-between items-start">
+                  <span class="text-[11px] font-bold text-sub">${diaNum}</span>
+                  ${movsDia.length > 0 ? `<span class="text-[9px] text-sub font-semibold">${movsDia.length} mov.</span>` : ''}
+                </div>
+                ${mostrarVal !== 0 ? `
+                  <div class="text-right">
+                    <span class="text-xs font-black font-mono privacy-blur ${mostrarVal < 0 || (calFiltroTipo === 'gastos' && mostrarVal > 0) ? 'text-rose-500' : 'text-emerald-500'}">
+                      ${mostrarVal > 0 && calFiltroTipo === 'neto' ? '+' : ''}${calFiltroTipo === 'gastos' ? '-' : ''}$${Math.abs(mostrarVal).toFixed(0)}
+                    </span>
+                  </div>
+                ` : ''}
+              `;
+              gridEl.appendChild(div);
+            } else {
+              const div = document.createElement('div');
+              div.className = "h-20 rounded-xl glass-card p-2 flex flex-col justify-between opacity-60";
+              div.innerHTML = `
+                <div class="flex justify-between text-[10px] font-bold text-sub">
+                  <span>${celda.sab || ''}${celda.dom ? ` - ${celda.dom}` : ''}</span>
+                  <span class="text-[9px]">S-D</span>
+                </div>
+              `;
+              gridEl.appendChild(div);
+            }
+          });
+
+          const semDiv = document.createElement('div');
+          semDiv.className = "h-20 rounded-xl glass-card p-2 flex flex-col justify-between text-right";
+          semDiv.innerHTML = `
+            <span class="text-[10px] font-bold text-sub uppercase">SEM. ${s + 1}</span>
+            <span class="text-xs font-black font-mono privacy-blur ${totalSemanaNeto >= 0 ? 'text-emerald-500' : 'text-rose-500'}">
+              ${totalSemanaNeto !== 0 ? (totalSemanaNeto > 0 ? '+' : '') + '$' + totalSemanaNeto.toFixed(0) : '—'}
+            </span>
+          `;
+          gridEl.appendChild(semDiv);
+        }
+      }
+
+      let valFinalMes = calFiltroTipo === 'neto' ? totalMesNeto : (calFiltroTipo === 'gastos' ? totalMesGastos : totalMesPayouts);
+      const mesTotalEl = document.getElementById('cal-total-mes');
+      mesTotalEl.textContent = `${valFinalMes >= 0 && calFiltroTipo === 'neto' ? '+' : ''}${calFiltroTipo === 'gastos' && valFinalMes > 0 ? '-' : ''}$${Math.abs(valFinalMes).toFixed(2)}`;
+      mesTotalEl.className = `text-base font-black font-mono privacy-blur ${valFinalMes < 0 || (calFiltroTipo === 'gastos' && valFinalMes > 0) ? 'text-rose-500' : 'text-emerald-500'}`;
+
+      renderizarMesesAnuales(anio);
+    }
+
+    function renderizarMesesAnuales(anio) {
+      const container = document.getElementById('cal-lista-meses');
+      container.innerHTML = '';
+      const cortos = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+      let totalAnioNeto = 0;
+
+      cortos.forEach((nombre, mIdx) => {
+        let mGastos = 0, mPayouts = 0;
+        registrosList.forEach(r => {
+          if (!r.fecha) return;
+          if (filtroEmpresaActiva !== 'todas' && (r.firma || '').toLowerCase() !== filtroEmpresaActiva.toLowerCase()) return;
+          const [a, m] = r.fecha.split('-').map(Number);
+          if (a === anio && m === (mIdx + 1)) {
+            if (r.tipo === 'gasto') mGastos += Number(r.monto || 0);
+            if (r.tipo === 'payout') mPayouts += Number(r.monto || 0);
+          }
+        });
+        const mNeto = mPayouts - mGastos;
+        totalAnioNeto += mNeto;
+
+        const esMesActivo = calFechaActual.getMonth() === mIdx;
+        const row = document.createElement('div');
+        row.className = `flex items-center justify-between p-1.5 rounded-lg text-xs cursor-pointer transition ${esMesActivo ? 'bg-blue-600/20 text-blue-500 font-bold' : 'text-sub hover:text-main'}`;
+        row.onclick = () => {
+          calFechaActual = new Date(anio, mIdx, 1);
+          renderizarCalendario();
+        };
+
+        row.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-8 font-semibold">${nombre}</span>
+            <div class="w-20 bg-slate-200 dark:bg-white/5 rounded-full h-1.5 overflow-hidden">
+              <div class="h-full rounded-full ${mNeto >= 0 ? 'bg-emerald-500' : 'bg-rose-500'}" style="width: ${Math.min(Math.abs(mNeto) / 5, 100)}%"></div>
+            </div>
+          </div>
+          <span class="font-mono text-[11px] privacy-blur ${mNeto !== 0 ? (mNeto >= 0 ? 'text-emerald-500 font-bold' : 'text-rose-500 font-bold') : 'text-slate-400'}">
+            ${mNeto !== 0 ? (mNeto > 0 ? '+' : '') + '$' + mNeto.toFixed(0) : '—'}
+          </span>
+        `;
+        container.appendChild(row);
+      });
+
+      const anioEl = document.getElementById('cal-total-anio');
+      anioEl.textContent = `${totalAnioNeto >= 0 ? '+' : ''}$${totalAnioNeto.toFixed(2)}`;
+      anioEl.className = `text-xs font-black font-mono privacy-blur ${totalAnioNeto >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+    }
+
+    function renderizarPorEmpresa() {
+      const tbody = document.getElementById('tabla-por-empresa');
+      tbody.innerHTML = '';
+
+      const empresasMap = {};
+
+      cuentasList.forEach(c => {
+        const emp = c.empresa || 'Otra';
+        if (!empresasMap[emp]) empresasMap[emp] = { nombre: emp, cuentas: 0, activas: 0, quemadas: 0, invertido: 0, cobrado: 0 };
+        empresasMap[emp].cuentas++;
+        if (c.estado === 'Quemada') empresasMap[emp].quemadas++;
+        else empresasMap[emp].activas++;
+        empresasMap[emp].invertido += Number(c.coste || 0);
+        empresasMap[emp].cobrado += Number(c.payoutsAcumulados || 0);
+      });
+
+      registrosList.forEach(r => {
+        const emp = r.firma || 'Otra';
+        if (!empresasMap[emp]) empresasMap[emp] = { nombre: emp, cuentas: 0, activas: 0, quemadas: 0, invertido: 0, cobrado: 0 };
+        if (r.tipo === 'payout' && !cuentasList.some(c => c.cuentaId === r.cuentaId)) {
+          empresasMap[emp].cobrado += Number(r.monto || 0);
+        }
+      });
+
+      const lista = Object.values(empresasMap);
+      if (lista.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-sub">No hay cuentas registradas aún. Haz clic en <strong>+ Nuevo</strong> para añadir la primera.</td></tr>`;
+        return;
+      }
+
+      lista.forEach(item => {
+        const neto = item.cobrado - item.invertido;
+        const roi = item.invertido > 0 ? ((neto / item.invertido) * 100).toFixed(1) : '0.0';
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition";
+        tr.innerHTML = `
+          <td class="py-3.5 px-3">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-md bg-blue-600/20 text-blue-500 font-black text-[10px] flex items-center justify-center">${item.nombre.charAt(0)}</span>
+              <span class="font-bold text-main">${item.nombre}</span>
+            </div>
+          </td>
+          <td class="py-3.5 px-3 text-center font-mono text-sub">${item.cuentas}</td>
+          <td class="py-3.5 px-3 text-center">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${item.activas > 0 ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-500 border border-rose-500/20'}">
+              ${item.activas} Activas
+            </span>
+          </td>
+          <td class="py-3.5 px-3 text-right font-mono text-sub privacy-blur">$${item.invertido.toFixed(2)}</td>
+          <td class="py-3.5 px-3 text-right font-mono text-emerald-500 font-bold privacy-blur">$${item.cobrado.toFixed(2)}</td>
+          <td class="py-3.5 px-3 text-right font-mono font-black privacy-blur ${neto >= 0 ? 'text-emerald-500' : 'text-rose-500'}">
+            ${neto >= 0 ? '+' : ''}$${neto.toFixed(2)}
+          </td>
+          <td class="py-3.5 px-3 text-right font-mono font-bold ${roi >= 0 ? 'text-emerald-500' : 'text-rose-500'}">
+            ${roi}%
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    let filtroCuentasActual = 'todas';
+    window.filtrarCuentas = function(filtro) {
+      filtroCuentasActual = filtro;
+      ['todas', 'evaluacion', 'fondeada', 'quemada'].forEach(f => {
+        const b = document.getElementById(`filtro-c-${f}`);
+        if (f === filtro) b.className = "px-3.5 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white transition";
+        else b.className = "px-3.5 py-1.5 rounded-xl text-xs font-semibold glass-card text-sub hover:text-main transition";
+      });
+      renderizarTarjetasCuentas();
+    };
+
+    function renderizarTarjetasCuentas() {
+      const grid = document.getElementById('grid-tarjetas-cuentas');
+      grid.innerHTML = '';
+
+      document.getElementById('count-todas').textContent = cuentasList.length;
+      document.getElementById('count-eval').textContent = cuentasList.filter(c => c.estado === 'Evaluación').length;
+      document.getElementById('count-fond').textContent = cuentasList.filter(c => c.estado.includes('Fondeada')).length;
+      document.getElementById('count-quem').textContent = cuentasList.filter(c => c.estado === 'Quemada').length;
+
+      let filtradas = cuentasList;
+      if (filtroCuentasActual === 'evaluacion') filtradas = cuentasList.filter(c => c.estado === 'Evaluación');
+      if (filtroCuentasActual === 'fondeada') filtradas = cuentasList.filter(c => c.estado.includes('Fondeada'));
+      if (filtroCuentasActual === 'quemada') filtradas = cuentasList.filter(c => c.estado === 'Quemada');
+
+      if (filtradas.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-12 text-center text-sub text-xs">No hay cuentas en esta categoría. Pulsa <strong>+ Nueva Cuenta</strong> para crear una.</div>`;
+        return;
+      }
+
+      filtradas.forEach(c => {
+        let badgeColor = "bg-amber-500/10 text-amber-500 border-amber-500/30";
+        if (c.estado === 'Fondeada Sim') badgeColor = "bg-blue-500/10 text-blue-500 border-blue-500/30";
+        if (c.estado === 'Fondeada Live') badgeColor = "bg-emerald-500/10 text-emerald-500 border-emerald-500/30";
+        if (c.estado === 'Quemada') badgeColor = "bg-rose-500/10 text-rose-500 border-rose-500/30";
+
+        const card = document.createElement('div');
+        card.className = "glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4 hover:border-blue-500/30 transition";
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-500 font-black text-xs flex items-center justify-center">${c.empresa.charAt(0)}</span>
+                <span class="font-bold text-main text-sm">${c.empresa}</span>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${badgeColor}">${c.estado}</span>
+            </div>
+
+            <div class="mt-3 space-y-1">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-sub">ID Cuenta:</span>
+                <span class="font-mono text-main font-semibold">${c.cuentaId || 'Sin ID'}</span>
+              </div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-sub">Tamaño:</span>
+                <span class="font-bold text-blue-500">${c.tamano}</span>
+              </div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-sub">Coste Inicial:</span>
+                <span class="font-mono text-sub privacy-blur">$${Number(c.coste || 0).toFixed(2)}</span>
+              </div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-sub">Cobrado Payouts:</span>
+                <span class="font-mono text-emerald-500 font-bold privacy-blur">$${Number(c.payoutsAcumulados || 0).toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t flex flex-wrap gap-1.5 justify-between" style="border-color: var(--border-color);">
+            ${c.estado === 'Evaluación' ? `
+              <button onclick="cambiarEstadoCuenta('${c.idKey}', 'Fondeada Sim')" class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-500 border border-blue-500/30 transition">
+                ✓ Pasar a PA
+              </button>
+            ` : ''}
+
+            ${c.estado.includes('Fondeada') ? `
+              <button onclick="abrirModalPayoutConCuenta('${c.empresa}', '${c.cuentaId}')" class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-500 border border-emerald-500/30 transition">
+                + Payout
+              </button>
+            ` : ''}
+
+            ${c.estado !== 'Quemada' ? `
+              <button onclick="cambiarEstadoCuenta('${c.idKey}', 'Quemada')" class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/30 transition">
+                Quemada
+              </button>
+            ` : `
+              <button onclick="cambiarEstadoCuenta('${c.idKey}', 'Evaluación')" class="px-2.5 py-1 text-[11px] font-bold rounded-lg glass-card text-sub transition">
+                Reactivar
+              </button>
+            `}
+
+            <button onclick="eliminarCuenta('${c.idKey}')" class="text-sub hover:text-rose-500 p-1 text-xs transition" title="Eliminar cuenta">
+              ✕
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderizarTablaPayouts() {
+      const tbody = document.getElementById('tabla-payouts-body');
+      tbody.innerHTML = '';
+
+      const payouts = registrosList.filter(r => r.tipo === 'payout').sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+      if (payouts.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-sub">No hay payouts registrados todavía. Pulsa <strong>+ Registrar Payout</strong> para cargar el primero.</td></tr>`;
+        return;
+      }
+
+      payouts.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition";
+        tr.innerHTML = `
+          <td class="p-4 font-mono text-sub">${p.fecha || '-'}</td>
+          <td class="p-4 font-bold text-main">${p.firma || '-'}</td>
+          <td class="p-4 font-mono text-sub">${p.cuentaId || '-'}</td>
+          <td class="p-4 text-sub">${p.concepto || 'Retiro de beneficios'}</td>
+          <td class="p-4 text-right font-mono font-black text-emerald-500 text-sm privacy-blur">+$${Number(p.monto || 0).toFixed(2)}</td>
+          <td class="p-4 text-center">
+            <button onclick="eliminarRegistro('${p.idKey}')" class="text-sub hover:text-rose-500 text-xs">✕</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function actualizarJournal() {
+      const tbody = document.getElementById('tabla-journal-body');
+      tbody.innerHTML = '';
+
+      let jPnl = 0;
+      let ganadas = 0, perdidas = 0;
+      let profitTotal = 0, lossTotal = 0;
+
+      journalList.sort((a,b) => new Date(a.fecha || a.timestamp) - new Date(b.fecha || b.timestamp));
+
+      let acum = 0;
+      let curvaPuntos = [];
+
+      journalList.forEach(j => {
+        const res = Number(j.resultado || 0);
+        jPnl += res;
+        acum += res;
+        curvaPuntos.push({ fecha: j.fecha, activo: j.activo, resultado: res, acum });
+
+        if (res > 0) {
+          profitTotal += res;
+          ganadas++;
+        } else {
+          lossTotal += Math.abs(res);
+          perdidas++;
+        }
+      });
+
+      const winRate = journalList.length > 0 ? ((ganadas / journalList.length) * 100).toFixed(1) : '0.0';
+      const pf = lossTotal > 0 ? (profitTotal / lossTotal).toFixed(2) : (profitTotal > 0 ? profitTotal.toFixed(2) : '0.00');
+
+      document.getElementById('j-profit-factor').textContent = pf;
+      document.getElementById('j-pnl-total').textContent = `${jPnl >= 0 ? '+' : ''}$${jPnl.toFixed(2)}`;
+      document.getElementById('j-pnl-total').className = `text-3xl font-black font-mono privacy-blur ${jPnl >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+      document.getElementById('j-winrate').textContent = `${winRate}%`;
+      document.getElementById('j-total-trades').textContent = journalList.length;
+
+      renderizarCurvaJournal(curvaPuntos, pf);
+
+      const reversed = [...journalList].reverse();
+      reversed.forEach(j => {
+        const res = Number(j.resultado || 0);
+        let psicoColor = "bg-blue-500/10 text-blue-500 border-blue-500/30";
+        if (j.psicologia && j.psicologia.includes("Venganza")) psicoColor = "bg-rose-500/10 text-rose-500 border-rose-500/30";
+        if (j.psicologia && j.psicologia.includes("FOMO")) psicoColor = "bg-amber-500/10 text-amber-500 border-amber-500/30";
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition";
+        tr.innerHTML = `
+          <td class="p-3.5 font-mono text-sub">${j.fecha}</td>
+          <td class="p-3.5 text-main font-semibold">${j.sesion}</td>
+          <td class="p-3.5 font-black text-blue-500">${j.activo}</td>
+          <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${j.direccion.includes('Compra') ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/30' : 'bg-blue-500/10 text-blue-500 border border-blue-500/30'}">${j.direccion}</span></td>
+          <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[11px] font-medium border ${psicoColor}">${j.psicologia || 'Normal'}</span></td>
+          <td class="p-3.5 text-sub">${j.notas || '-'}</td>
+          <td class="p-3.5 text-right font-mono font-bold privacy-blur ${res >= 0 ? 'text-emerald-500' : 'text-rose-500'}">${res >= 0 ? '+' : ''}$${res.toFixed(2)}</td>
+          <td class="p-3.5 text-center"><button onclick="eliminarTradeJournal('${j.idKey}')" class="text-sub hover:text-rose-500">✕</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderizarCurvaJournal(puntos, pf) {
+      const g = document.getElementById('svg-journal-elements');
+      g.innerHTML = '';
+      const badge = document.getElementById('j-badge-estado');
+
+      if (puntos.length === 0) {
+        badge.textContent = "Sin datos";
+        g.innerHTML = `<text x="400" y="100" fill="#94A3B8" font-size="12" text-anchor="middle">Registra tu primer trade para ver la curva de crecimiento</text>`;
+        return;
+      }
+
+      badge.textContent = pf >= 1.5 ? "🔥 Alta Consistencia" : (pf >= 1 ? "📈 Rentable" : "⚠️ En Zona de Riesgo");
+
+      const min = Math.min(0, ...puntos.map(p => p.acum));
+      const max = Math.max(...puntos.map(p => p.acum), min + 10);
+      const range = max - min || 1;
+
+      const w = 800;
+      const h = 200;
+      const step = puntos.length > 1 ? w / (puntos.length - 1) : w / 2;
+
+      let coords = puntos.map((p, i) => {
+        const cx = puntos.length === 1 ? w / 2 : i * step;
+        const cy = h - ((p.acum - min) / range) * (h - 30) - 15;
+        return { cx, cy, data: p };
+      });
+
+      let dArea = `M ${coords[0].cx} ${h} `;
+      coords.forEach(c => dArea += `L ${c.cx} ${c.cy} `);
+      dArea += `L ${coords[coords.length - 1].cx} ${h} Z`;
+
+      const pathA = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      pathA.setAttribute("d", dArea);
+      pathA.setAttribute("fill", "url(#equity-grad-journal)");
+      g.appendChild(pathA);
+
+      let dLine = `M ${coords[0].cx} ${coords[0].cy} `;
+      coords.forEach(c => dLine += `L ${c.cx} ${c.cy} `);
+
+      const pathL = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      pathL.setAttribute("d", dLine);
+      pathL.setAttribute("fill", "none");
+      pathL.setAttribute("stroke", "#3B82F6");
+      pathL.setAttribute("stroke-width", "3");
+      pathL.setAttribute("stroke-linecap", "round");
+      g.appendChild(pathL);
+
+      coords.forEach(c => {
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", c.cx);
+        circle.setAttribute("cy", c.cy);
+        circle.setAttribute("r", "5");
+        circle.setAttribute("fill", c.data.resultado >= 0 ? "#10B981" : "#EF4444");
+        circle.setAttribute("stroke", "var(--bg-body)");
+        circle.setAttribute("stroke-width", "2");
+        g.appendChild(circle);
+      });
+    }
+
+    window.toggleFormJournal = function() {
+      document.getElementById('panel-form-journal').classList.toggle('hidden');
+    };
+
+    window.abrirDrawerNuevaCuenta = function() {
+      document.getElementById('drawer-backdrop').classList.remove('hidden');
+      document.getElementById('drawer-nueva-cuenta').classList.add('drawer-open');
+    };
+
+    window.cerrarDrawerNuevaCuenta = function() {
+      document.getElementById('drawer-backdrop').classList.add('hidden');
+      document.getElementById('drawer-nueva-cuenta').classList.remove('drawer-open');
+    };
+
+    window.abrirModalPayout = function() {
+      document.getElementById('modal-payout').classList.remove('hidden');
+    };
+
+    window.abrirModalPayoutConCuenta = function(firma, cuentaId) {
+      document.getElementById('p-firma').value = firma;
+      document.getElementById('p-cuenta-id').value = cuentaId;
+      document.getElementById('modal-payout').classList.remove('hidden');
+    };
+
+    window.cerrarModalPayout = function() {
+      document.getElementById('modal-payout').classList.add('hidden');
+    };
   </script>
 </body>
 </html>
