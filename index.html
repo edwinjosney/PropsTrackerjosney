@@ -394,10 +394,6 @@
                 <svg class="w-3.5 h-3.5 text-sub" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                 <span id="titulo-tarjeta-beneficio">Beneficio neto</span>
               </span>
-              <div class="flex rounded-lg p-0.5 border text-[10px] font-bold" style="background-color: var(--bg-input); border-color: var(--border-color);">
-                <button onclick="cambiarModoBrutoNeto('bruto')" id="btn-bn-bruto-sub" class="px-2 py-0.5 rounded text-sub hover:text-main transition">Bruto</button>
-                <button onclick="cambiarModoBrutoNeto('neto')" id="btn-bn-neto-sub" class="px-2 py-0.5 rounded bg-blue-600 text-white transition">Neto</button>
-              </div>
             </div>
 
             <div>
@@ -513,13 +509,15 @@
 
         <!-- SECCIÓN: POR EMPRESA -->
         <div class="glass-card p-4 sm:p-6 rounded-2xl space-y-4">
-          <div>
-            <h3 class="text-base font-extrabold text-main">Por empresa</h3>
-            <p class="text-xs text-sub mt-0.5">Beneficio neto = cobrado - invertido</p>
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-extrabold text-main">Por empresa</h3>
+              <p class="text-xs text-sub mt-0.5">Beneficio neto = cobrado - invertido</p>
+            </div>
           </div>
 
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs min-w-[500px]">
+            <table class="w-full text-left text-xs min-w-[550px]">
               <thead class="text-sub uppercase text-[10px] font-bold border-b" style="border-color: var(--border-color);">
                 <tr>
                   <th class="py-3 px-3">Empresa</th>
@@ -529,9 +527,57 @@
                   <th class="py-3 px-3 text-right">Cobrado</th>
                   <th class="py-3 px-3 text-right">Beneficio Neto</th>
                   <th class="py-3 px-3 text-right">ROI</th>
+                  <th class="py-3 px-3 text-center">Acciones</th>
                 </tr>
               </thead>
               <tbody id="tabla-por-empresa" class="divide-y font-medium" style="border-color: var(--border-color);"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SECCIÓN: HISTORIAL DE REGISTROS CONTABLES (SELECCIÓN Y BORRADO) -->
+        <div class="glass-card p-4 sm:p-6 rounded-2xl space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base font-extrabold text-main">Historial de Registros Contables</h3>
+                <span id="badge-total-registros" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-600/10 text-blue-500 border border-blue-500/20">0</span>
+              </div>
+              <p class="text-xs text-sub mt-0.5">Control de cobros (payouts) e inversiones en cuentas con selección múltiple y borrado</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <!-- Filtro de Tipo: Todos / Payouts / Gastos -->
+              <div class="flex items-center p-0.5 rounded-xl border text-xs font-semibold" style="background-color: var(--bg-input); border-color: var(--border-color);">
+                <button onclick="cambiarFiltroTipoRegistros('todos')" id="filtro-reg-todos" class="px-3 py-1.5 rounded-lg bg-blue-600 text-white transition shadow-sm font-bold">Todos</button>
+                <button onclick="cambiarFiltroTipoRegistros('payout')" id="filtro-reg-payout" class="px-3 py-1.5 rounded-lg text-sub hover:text-main transition font-medium">Payouts</button>
+                <button onclick="cambiarFiltroTipoRegistros('gasto')" id="filtro-reg-gasto" class="px-3 py-1.5 rounded-lg text-sub hover:text-main transition font-medium">Gastos / Compras</button>
+              </div>
+
+              <!-- Botón Borrar Seleccionados -->
+              <button id="btn-borrar-seleccionados" onclick="eliminarRegistrosSeleccionados()" class="hidden items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white transition shadow-lg shadow-rose-600/25">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                <span>Borrar seleccionados (<span id="count-seleccionados">0</span>)</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs min-w-[650px]">
+              <thead class="text-sub uppercase text-[10px] font-bold border-b" style="border-color: var(--border-color); background-color: var(--bg-input);">
+                <tr>
+                  <th class="py-3 px-3 w-10 text-center">
+                    <input type="checkbox" id="check-select-all-reg" onchange="toggleSeleccionarTodosRegistros(this.checked)" class="rounded cursor-pointer accent-blue-600 w-3.5 h-3.5" title="Seleccionar todos">
+                  </th>
+                  <th class="py-3 px-3">Fecha</th>
+                  <th class="py-3 px-3">Tipo</th>
+                  <th class="py-3 px-3">Empresa</th>
+                  <th class="py-3 px-3">Concepto / Detalle</th>
+                  <th class="py-3 px-3 text-right">Monto</th>
+                  <th class="py-3 px-3 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-registros-body" class="divide-y font-medium" style="border-color: var(--border-color);"></tbody>
             </table>
           </div>
         </div>
@@ -658,17 +704,26 @@
             <h2 class="text-xl font-black text-main">Historial y Control de Payouts</h2>
             <p class="text-xs text-sub">Control total de retiros, splits netos y fechas de cobro</p>
           </div>
-          <button onclick="abrirModalPayout()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-lg shadow-emerald-600/25 flex items-center gap-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-            <span>+ Registrar Payout</span>
-          </button>
+          <div class="flex items-center gap-2">
+            <button id="btn-borrar-payouts-sel" onclick="eliminarRegistrosSeleccionados()" class="hidden items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white transition shadow-lg shadow-rose-600/25">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              <span>Borrar seleccionados (<span id="count-payouts-sel">0</span>)</span>
+            </button>
+            <button onclick="abrirModalPayout()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-lg shadow-emerald-600/25 flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+              <span>+ Registrar Payout</span>
+            </button>
+          </div>
         </div>
 
         <div class="glass-card rounded-2xl overflow-hidden">
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs min-w-[500px]">
+            <table class="w-full text-left text-xs min-w-[550px]">
               <thead class="text-sub uppercase text-[10px] font-bold border-b" style="border-color: var(--border-color); background-color: var(--bg-input);">
                 <tr>
+                  <th class="p-4 w-10 text-center">
+                    <input type="checkbox" id="check-select-all-payouts" onchange="toggleSeleccionarTodosPayouts(this.checked)" class="rounded cursor-pointer accent-blue-600 w-3.5 h-3.5" title="Seleccionar todos">
+                  </th>
                   <th class="p-4">Fecha</th>
                   <th class="p-4">Firma</th>
                   <th class="p-4">ID de Cuenta</th>
@@ -1101,6 +1156,8 @@
     let cuentasList = [];
     let registrosList = [];
     let journalList = [];
+    let registrosSeleccionados = new Set();
+    let filtroTipoRegistros = 'todos';
 
     // Filtros
     let filtroTiempo = 'todo';
@@ -1515,9 +1572,71 @@
       };
 
       window.eliminarRegistro = async function(idKey) {
-        if (confirm("¿Deseas eliminar este registro contable?")) {
+        const r = registrosList.find(x => x.idKey === idKey);
+        const desc = r ? ` (${r.firma || 'Movimiento'} - ${r.tipo === 'payout' ? '+' : '-'}$${Number(r.monto||0).toFixed(2)})` : '';
+        if (confirm(`¿Deseas eliminar este registro contable${desc}?`)) {
+          if (r && r.tipo === 'payout' && r.cuentaId) {
+            const c = cuentasList.find(x => x.cuentaId === r.cuentaId);
+            if (c) {
+              const nuevoAcum = Math.max(0, (c.payoutsAcumulados || 0) - Number(r.monto || 0));
+              await update(ref(db, `usuarios/${usuarioId}/cuentas/${c.idKey}`), { payoutsAcumulados: nuevoAcum });
+            }
+          }
           await remove(ref(db, `usuarios/${usuarioId}/registros/${idKey}`));
+          registrosSeleccionados.delete(idKey);
+          actualizarBotonesBorrarSeleccionados();
         }
+      };
+
+      window.eliminarRegistrosSeleccionados = async function() {
+        if (registrosSeleccionados.size === 0) {
+          alert("Selecciona al menos un registro en las casillas para borrar.");
+          return;
+        }
+        const count = registrosSeleccionados.size;
+        if (!confirm(`¿Estás seguro de que deseas eliminar permanentemente los ${count} registros seleccionados? Esta acción no se puede deshacer.`)) return;
+
+        const promises = [];
+        for (const idKey of Array.from(registrosSeleccionados)) {
+          const r = registrosList.find(x => x.idKey === idKey);
+          if (r && r.tipo === 'payout' && r.cuentaId) {
+            const c = cuentasList.find(x => x.cuentaId === r.cuentaId);
+            if (c) {
+              const nuevoAcum = Math.max(0, (c.payoutsAcumulados || 0) - Number(r.monto || 0));
+              promises.push(update(ref(db, `usuarios/${usuarioId}/cuentas/${c.idKey}`), { payoutsAcumulados: nuevoAcum }));
+            }
+          }
+          promises.push(remove(ref(db, `usuarios/${usuarioId}/registros/${idKey}`)));
+        }
+        await Promise.all(promises);
+        registrosSeleccionados.clear();
+        actualizarBotonesBorrarSeleccionados();
+        actualizarTodo();
+      };
+
+      window.eliminarRegistrosEmpresa = async function(empresa) {
+        const regsEmp = registrosList.filter(r => (r.firma || 'Otra').trim().toLowerCase() === empresa.trim().toLowerCase());
+        if (regsEmp.length === 0) {
+          alert(`No hay registros contables asociados a "${empresa}".`);
+          return;
+        }
+        if (!confirm(`¿Deseas eliminar TODOS los registros contables (${regsEmp.length} movimiento(s)) de "${empresa}"?`)) return;
+
+        const promises = [];
+        for (const r of regsEmp) {
+          if (r.tipo === 'payout' && r.cuentaId) {
+            const c = cuentasList.find(x => x.cuentaId === r.cuentaId);
+            if (c) {
+              const nuevoAcum = Math.max(0, (c.payoutsAcumulados || 0) - Number(r.monto || 0));
+              promises.push(update(ref(db, `usuarios/${usuarioId}/cuentas/${c.idKey}`), { payoutsAcumulados: nuevoAcum }));
+            }
+          }
+          promises.push(remove(ref(db, `usuarios/${usuarioId}/registros/${r.idKey}`)));
+          registrosSeleccionados.delete(r.idKey);
+        }
+        await Promise.all(promises);
+        actualizarBotonesBorrarSeleccionados();
+        actualizarTodo();
       };
 
       document.getElementById('btn-exportar').addEventListener('click', () => {
@@ -1626,18 +1745,18 @@
 
       if (modoBrutoNeto === 'bruto') {
         // MODO BRUTO:
-        // Payouts cobrados: muestra el total en pagos sin descontar inversión
+        // Payouts cobrados: muestra el total recaudado bruto sin descontar inversión
         if (tituloPayouts) tituloPayouts.textContent = "Payouts (Bruto)";
         if (kpiPayoutsMain) {
           kpiPayoutsMain.textContent = formatearMoneda(totalPayouts);
           kpiPayoutsMain.className = "text-3xl sm:text-4xl font-black text-emerald-500 font-mono privacy-blur";
         }
         if (badgePayoutsSub) {
-          badgePayoutsSub.textContent = `${payoutsFiltradosCount} retiros · ${formatearMoneda(totalPayouts)} brutos recibidos`;
+          badgePayoutsSub.textContent = `${payoutsFiltradosCount} retiros · Total recaudado sin deducciones`;
         }
-        if (labelPayoutsCount) labelPayoutsCount.textContent = "Total retiros:";
+        if (labelPayoutsCount) labelPayoutsCount.textContent = "Número de cobros:";
         if (badgeCountLabel) {
-          badgeCountLabel.textContent = `${payoutsFiltradosCount} cobros`;
+          badgeCountLabel.textContent = `${payoutsFiltradosCount} retiros`;
           badgeCountLabel.className = "font-bold text-emerald-500 font-mono";
         }
 
@@ -1659,19 +1778,19 @@
         }
       } else {
         // MODO NETO:
-        // Calcula cuánto se invirtió vs cuánto se generó en payouts para saber el ROI real y beneficio neto
+        // El número grande se modifica a neto real (Payouts - Inversión)
         if (tituloPayouts) tituloPayouts.textContent = "Payouts (Neto)";
         if (kpiPayoutsMain) {
-          kpiPayoutsMain.textContent = formatearMoneda(totalPayouts);
-          kpiPayoutsMain.className = "text-3xl sm:text-4xl font-black text-emerald-500 font-mono privacy-blur";
+          kpiPayoutsMain.textContent = formatearMoneda(pnlNeto, true);
+          kpiPayoutsMain.className = `text-3xl sm:text-4xl font-black font-mono privacy-blur ${pnlNeto >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
         }
         if (badgePayoutsSub) {
-          badgePayoutsSub.textContent = `${payoutsFiltradosCount} retiros · Balance neto: ${formatearMoneda(pnlNeto, true)}`;
+          badgePayoutsSub.textContent = `${payoutsFiltradosCount} retiros · Cobrado bruto: ${formatearMoneda(totalPayouts)}`;
         }
-        if (labelPayoutsCount) labelPayoutsCount.textContent = "Neto tras inversión:";
+        if (labelPayoutsCount) labelPayoutsCount.textContent = "Número de cobros:";
         if (badgeCountLabel) {
-          badgeCountLabel.textContent = formatearMoneda(pnlNeto, true);
-          badgeCountLabel.className = `font-bold font-mono ${pnlNeto >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+          badgeCountLabel.textContent = `${payoutsFiltradosCount} retiros`;
+          badgeCountLabel.className = "font-bold text-sub font-mono";
         }
 
         // Beneficio Neto real: Payouts - Invertido
@@ -1749,6 +1868,7 @@
       renderizarPorEmpresa();
       renderizarTarjetasCuentas();
       renderizarTablaPayouts();
+      renderizarTablaRegistros();
 
       const ratioEf = totalInvertido > 0 ? (totalPayouts / totalInvertido).toFixed(2) : (totalPayouts > 0 ? '∞' : '0.00');
       const anRatio = document.getElementById('an-ratio-eficiencia');
@@ -2089,7 +2209,7 @@
 
       const lista = Object.values(empresasMap);
       if (lista.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-sub">No hay cuentas ni registros contables aún. Haz clic en <strong>+ Nuevo</strong> para añadir la primera.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-sub">No hay cuentas ni registros contables aún. Haz clic en <strong>+ Nuevo</strong> para añadir la primera.</td></tr>`;
         return;
       }
 
@@ -2119,6 +2239,16 @@
           </td>
           <td class="py-3.5 px-3 text-right font-mono font-bold ${roi >= 0 ? 'text-emerald-500' : 'text-rose-500'}">
             ${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%
+          </td>
+          <td class="py-3.5 px-3 text-center">
+            <div class="flex items-center justify-center gap-1.5">
+              <button onclick="seleccionarFiltroEmpresa('${item.nombre}')" class="p-1 text-sub hover:text-blue-500 rounded hover:bg-blue-500/10 transition" title="Filtrar movimientos de ${item.nombre}">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+              </button>
+              <button onclick="eliminarRegistrosEmpresa('${item.nombre}')" class="p-1 text-sub hover:text-rose-500 rounded hover:bg-rose-500/10 transition" title="Borrar registros contables de ${item.nombre}">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
           </td>
         `;
         tbody.appendChild(tr);
@@ -2226,30 +2356,203 @@
 
     function renderizarTablaPayouts() {
       const tbody = document.getElementById('tabla-payouts-body');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       const payouts = registrosList.filter(r => r.tipo === 'payout').sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
       if (payouts.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-sub">No hay payouts registrados todavía. Pulsa <strong>+ Registrar Payout</strong> para cargar el primero.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-sub">No hay payouts registrados todavía. Pulsa <strong>+ Registrar Payout</strong> para cargar el primero.</td></tr>`;
+        actualizarBotonesBorrarSeleccionados();
         return;
       }
 
       payouts.forEach(p => {
+        const isSel = registrosSeleccionados.has(p.idKey);
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition";
+        tr.className = `hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition ${isSel ? 'bg-blue-500/5' : ''}`;
         tr.innerHTML = `
+          <td class="p-4 text-center">
+            <input type="checkbox" onchange="toggleSeleccionarRegistro('${p.idKey}')" ${isSel ? 'checked' : ''} class="rounded cursor-pointer accent-blue-600 w-3.5 h-3.5">
+          </td>
           <td class="p-4 font-mono text-sub">${p.fecha || '-'}</td>
           <td class="p-4 font-bold text-main">${p.firma || '-'}</td>
           <td class="p-4 font-mono text-sub">${p.cuentaId || '-'}</td>
           <td class="p-4 text-sub">${p.concepto || 'Retiro de beneficios'}</td>
           <td class="p-4 text-right font-mono font-black text-emerald-500 text-sm privacy-blur">+$${Number(p.monto || 0).toFixed(2)}</td>
           <td class="p-4 text-center">
-            <button onclick="eliminarRegistro('${p.idKey}')" class="text-sub hover:text-rose-500 text-xs">✕</button>
+            <button onclick="eliminarRegistro('${p.idKey}')" class="p-1 text-sub hover:text-rose-500 rounded hover:bg-rose-500/10 transition" title="Eliminar este payout">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
           </td>
         `;
         tbody.appendChild(tr);
       });
+      actualizarBotonesBorrarSeleccionados();
     }
+
+    window.cambiarFiltroTipoRegistros = function(tipo) {
+      filtroTipoRegistros = tipo;
+      ['todos', 'payout', 'gasto'].forEach(t => {
+        const btn = document.getElementById(`filtro-reg-${t}`);
+        if (btn) {
+          if (t === tipo) btn.className = "px-3 py-1.5 rounded-lg bg-blue-600 text-white transition shadow-sm font-bold";
+          else btn.className = "px-3 py-1.5 rounded-lg text-sub hover:text-main transition font-medium";
+        }
+      });
+      renderizarTablaRegistros();
+    };
+
+    function renderizarTablaRegistros() {
+      const tbody = document.getElementById('tabla-registros-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      let lista = [...registrosList];
+
+      if (filtroEmpresaActiva !== 'todas') {
+        lista = lista.filter(r => (r.firma || '').trim().toLowerCase() === filtroEmpresaActiva.trim().toLowerCase());
+      }
+
+      if (filtroTipoRegistros !== 'todos') {
+        lista = lista.filter(r => r.tipo === filtroTipoRegistros);
+      }
+
+      lista.sort((a,b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
+
+      const badgeTotal = document.getElementById('badge-total-registros');
+      if (badgeTotal) badgeTotal.textContent = lista.length;
+
+      if (lista.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-sub">No hay registros contables que coincidan con los filtros actuales.</td></tr>`;
+        actualizarBotonesBorrarSeleccionados();
+        return;
+      }
+
+      lista.forEach(r => {
+        const isSel = registrosSeleccionados.has(r.idKey);
+        const tr = document.createElement('tr');
+        tr.className = `hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition ${isSel ? 'bg-blue-500/5' : ''}`;
+
+        const isPayout = r.tipo === 'payout';
+        const tipoBadge = isPayout 
+          ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Payout</span>`
+          : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-500 border border-rose-500/20">Gasto / Inversión</span>`;
+
+        const montoStr = isPayout
+          ? `<span class="font-mono font-bold text-emerald-500 privacy-blur">+$${Number(r.monto || 0).toFixed(2)}</span>`
+          : `<span class="font-mono font-bold text-rose-500 privacy-blur">-$${Number(r.monto || 0).toFixed(2)}</span>`;
+
+        tr.innerHTML = `
+          <td class="py-3 px-3 text-center">
+            <input type="checkbox" onchange="toggleSeleccionarRegistro('${r.idKey}')" ${isSel ? 'checked' : ''} class="rounded cursor-pointer accent-blue-600 w-3.5 h-3.5">
+          </td>
+          <td class="py-3 px-3 font-mono text-sub">${r.fecha || '-'}</td>
+          <td class="py-3 px-3">${tipoBadge}</td>
+          <td class="py-3 px-3 font-bold text-main">${r.firma || 'Otra'}</td>
+          <td class="py-3 px-3 text-sub">${r.concepto || (isPayout ? 'Retiro de beneficios' : 'Compra de cuenta')}</td>
+          <td class="py-3 px-3 text-right">${montoStr}</td>
+          <td class="py-3 px-3 text-center">
+            <button onclick="eliminarRegistro('${r.idKey}')" class="p-1 text-sub hover:text-rose-500 rounded-lg hover:bg-rose-500/10 transition" title="Eliminar este registro">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      actualizarBotonesBorrarSeleccionados();
+    }
+
+    function actualizarBotonesBorrarSeleccionados() {
+      const count = registrosSeleccionados.size;
+
+      // Botón en Historial de Registros
+      const btnReg = document.getElementById('btn-borrar-seleccionados');
+      const countReg = document.getElementById('count-seleccionados');
+      if (btnReg && countReg) {
+        countReg.textContent = count;
+        if (count > 0) {
+          btnReg.classList.remove('hidden');
+          btnReg.classList.add('flex');
+        } else {
+          btnReg.classList.add('hidden');
+          btnReg.classList.remove('flex');
+        }
+      }
+
+      // Botón en Payouts
+      const btnPay = document.getElementById('btn-borrar-payouts-sel');
+      const countPay = document.getElementById('count-payouts-sel');
+      if (btnPay && countPay) {
+        countPay.textContent = count;
+        if (count > 0) {
+          btnPay.classList.remove('hidden');
+          btnPay.classList.add('flex');
+        } else {
+          btnPay.classList.add('hidden');
+          btnPay.classList.remove('flex');
+        }
+      }
+
+      // Master checkbox en Historial
+      const checkAllReg = document.getElementById('check-select-all-reg');
+      if (checkAllReg) {
+        let visibleIds = registrosList.map(r => r.idKey);
+        if (filtroEmpresaActiva !== 'todas') {
+          visibleIds = registrosList.filter(r => (r.firma || '').trim().toLowerCase() === filtroEmpresaActiva.trim().toLowerCase()).map(r => r.idKey);
+        }
+        if (filtroTipoRegistros !== 'todos') {
+          visibleIds = registrosList.filter(r => r.tipo === filtroTipoRegistros).map(r => r.idKey);
+        }
+        checkAllReg.checked = visibleIds.length > 0 && visibleIds.every(id => registrosSeleccionados.has(id));
+      }
+
+      // Master checkbox en Payouts
+      const checkAllPay = document.getElementById('check-select-all-payouts');
+      if (checkAllPay) {
+        const payoutsIds = registrosList.filter(r => r.tipo === 'payout').map(r => r.idKey);
+        checkAllPay.checked = payoutsIds.length > 0 && payoutsIds.every(id => registrosSeleccionados.has(id));
+      }
+    }
+
+    window.toggleSeleccionarRegistro = function(idKey) {
+      if (registrosSeleccionados.has(idKey)) {
+        registrosSeleccionados.delete(idKey);
+      } else {
+        registrosSeleccionados.add(idKey);
+      }
+      renderizarTablaRegistros();
+      renderizarTablaPayouts();
+    };
+
+    window.toggleSeleccionarTodosRegistros = function(checked) {
+      let visible = [...registrosList];
+      if (filtroEmpresaActiva !== 'todas') {
+        visible = visible.filter(r => (r.firma || '').trim().toLowerCase() === filtroEmpresaActiva.trim().toLowerCase());
+      }
+      if (filtroTipoRegistros !== 'todos') {
+        visible = visible.filter(r => r.tipo === filtroTipoRegistros);
+      }
+
+      if (checked) {
+        visible.forEach(r => registrosSeleccionados.add(r.idKey));
+      } else {
+        visible.forEach(r => registrosSeleccionados.delete(r.idKey));
+      }
+      renderizarTablaRegistros();
+      renderizarTablaPayouts();
+    };
+
+    window.toggleSeleccionarTodosPayouts = function(checked) {
+      const payouts = registrosList.filter(r => r.tipo === 'payout');
+      if (checked) {
+        payouts.forEach(p => registrosSeleccionados.add(p.idKey));
+      } else {
+        payouts.forEach(p => registrosSeleccionados.delete(p.idKey));
+      }
+      renderizarTablaRegistros();
+      renderizarTablaPayouts();
+    };
 
     function actualizarJournal() {
       const tbody = document.getElementById('tabla-journal-body');
