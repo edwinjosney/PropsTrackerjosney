@@ -1105,7 +1105,8 @@
     // Filtros
     let filtroTiempo = 'todo';
     let filtroEmpresaActiva = 'todas';
-    let modoBrutoNeto = 'neto';
+    let modoBrutoNeto = localStorage.getItem('prop_modo_bruto_neto') || 'neto';
+    let filtroCuentasActual = 'todas';
 
     // Calendario
     let calFiltroTipo = 'neto';
@@ -1228,15 +1229,11 @@
       });
     }
 
-    let modoBrutoNeto = localStorage.getItem('prop_modo_bruto_neto') || 'neto';
-
-    window.cambiarModoBrutoNeto = function(modo) {
-      modoBrutoNeto = modo;
-      localStorage.setItem('prop_modo_bruto_neto', modo);
+    function sincronizarBotonesBrutoNeto() {
       ['bruto', 'neto'].forEach(m => {
         const btnMain = document.getElementById(`btn-bn-${m}-main`);
         const btnSub = document.getElementById(`btn-bn-${m}-sub`);
-        if (m === modo) {
+        if (m === modoBrutoNeto) {
           if (btnMain) btnMain.className = "px-2 py-0.5 rounded bg-blue-600 text-white transition shadow-sm font-bold";
           if (btnSub) btnSub.className = "px-2 py-0.5 rounded bg-blue-600 text-white transition shadow-sm font-bold";
         } else {
@@ -1244,9 +1241,15 @@
           if (btnSub) btnSub.className = "px-2 py-0.5 rounded text-sub hover:text-main transition font-medium";
         }
       });
+    }
+
+    window.cambiarModoBrutoNeto = function(modo) {
+      modoBrutoNeto = modo;
+      localStorage.setItem('prop_modo_bruto_neto', modo);
+      sincronizarBotonesBrutoNeto();
       actualizarTodo();
     };
-    cambiarModoBrutoNeto(modoBrutoNeto);
+    sincronizarBotonesBrutoNeto();
 
     window.toggleModoPrivacidad = function() {
       isPrivacyMode = !isPrivacyMode;
@@ -2122,7 +2125,6 @@
       });
     }
 
-    let filtroCuentasActual = 'todas';
     window.filtrarCuentas = function(filtro) {
       filtroCuentasActual = filtro;
       ['todas', 'evaluacion', 'fondeada', 'quemada'].forEach(f => {
