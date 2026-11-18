@@ -2,7 +2,7 @@
 <html lang="es" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PropTracker • Edwin Josney</title>
   <meta name="theme-color" content="#0B0F17">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -129,13 +129,13 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col md:flex-row antialiased selection:bg-blue-600 selection:text-white" onclick="cerrarDropdownsClickAfuera(event)">
+<body class="min-h-screen flex flex-col md:flex-row antialiased selection:bg-blue-600 selection:text-white pb-20 md:pb-0" onclick="cerrarDropdownsClickAfuera(event)">
 
-  <!-- MODAL DE ACCESO / LOGIN -->
+  <!-- MODAL DE ACCESO / LOGIN (RESPONSIVE Y DESPLAZABLE EN MÓVILES) -->
   <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl p-4 overflow-y-auto hidden">
     <div class="glass-card w-full max-w-md p-6 sm:p-8 rounded-2xl space-y-6 shadow-2xl border border-white/10 my-auto">
       <div class="flex items-center justify-center gap-3">
-        <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/25">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/25 shrink-0">
           <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
         </div>
         <div>
@@ -158,8 +158,9 @@
           <label class="text-xs font-semibold text-sub block mb-1.5">Contraseña</label>
           <input type="password" id="auth-pass" placeholder="••••••••" required class="w-full glass-input rounded-xl p-3 text-sm">
         </div>
-        <button type="submit" id="btn-auth-submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-xl py-3.5 transition shadow-lg shadow-blue-600/30">
-          Entrar a mi Panel
+        <button type="submit" id="btn-auth-submit" class="w-full bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold text-sm rounded-xl py-3.5 transition shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 cursor-pointer">
+          <span>Entrar a mi Panel</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </button>
       </form>
     </div>
@@ -236,7 +237,7 @@
           </button>
         </div>
 
-        <!-- Grupo JOURNAL (Renombrado solo a Journal) -->
+        <!-- Grupo JOURNAL -->
         <div class="space-y-1">
           <span class="sidebar-header-text text-[10px] font-bold uppercase tracking-wider text-sub px-3">Trading</span>
           
@@ -252,7 +253,6 @@
 
       <!-- Footer: Botón Contraer Panel & Perfil de Usuario -->
       <div class="pt-4 border-t space-y-3" style="border-color: var(--border-color);">
-        <!-- Botón de Contraer / Expandir Sidebar (Exacto a Colmena) -->
         <button onclick="toggleSidebar()" id="btn-toggle-sidebar" class="sidebar-item w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-sub hover:text-main hover:bg-black/5 dark:hover:bg-white/5 transition" title="Contraer o expandir barra lateral">
           <svg id="icon-sidebar-collapse" class="w-4 h-4 shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
           <span class="sidebar-text font-medium" id="sidebar-toggle-text">Contraer</span>
@@ -278,38 +278,39 @@
     <!-- ÁREA DE CONTENIDO PRINCIPAL -->
     <main class="flex-1 flex flex-col min-w-0 overflow-y-auto no-scrollbar">
       
-      <!-- TOPBAR SUPERIOR (Buscar, Modo Privacidad, Tema Claro/Oscuro, + Nuevo con Dropdown) -->
-      <header class="h-16 px-6 border-b flex items-center justify-between shrink-0 sticky top-0 z-30 backdrop-blur-md transition-colors" style="background-color: var(--bg-card); border-color: var(--border-color);">
-        <div class="flex items-center gap-3">
-          <h1 id="header-view-title" class="text-lg font-black text-main tracking-tight">Panel</h1>
+      <!-- TOPBAR SUPERIOR (Buscar, Modo Privacidad, Tema Claro/Oscuro, Sesión en Móvil, + Nuevo con Dropdown) -->
+      <header class="h-16 px-4 sm:px-6 border-b flex items-center justify-between shrink-0 sticky top-0 z-30 backdrop-blur-md transition-colors" style="background-color: var(--bg-card); border-color: var(--border-color);">
+        <div class="flex items-center gap-2 sm:gap-3">
+          <h1 id="header-view-title" class="text-base sm:text-lg font-black text-main tracking-tight">Panel</h1>
+          <span id="mobile-user-badge" class="md:hidden text-[10px] px-2 py-0.5 rounded-lg bg-blue-600/10 text-blue-500 font-bold border border-blue-500/20 font-mono truncate max-w-[90px]">Edwin</span>
         </div>
 
-        <div class="flex items-center gap-2.5">
+        <div class="flex items-center gap-1.5 sm:gap-2.5">
           <!-- Botón Modo Privacidad (Ojo) -->
           <button id="btn-privacy-toggle" onclick="toggleModoPrivacidad()" class="p-2 glass-card rounded-xl text-sub hover:text-main transition flex items-center justify-center" title="Ocultar o mostrar balances">
             <svg id="icon-eye-open" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
             <svg id="icon-eye-closed" class="w-4 h-4 hidden text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
           </button>
 
-          <!-- Botón Tema Claro / Oscuro (Liquid Glass Toggle) -->
+          <!-- Botón Tema Claro / Oscuro -->
           <button id="btn-theme-toggle" onclick="toggleTema()" class="p-2 glass-card rounded-xl text-sub hover:text-main transition flex items-center justify-center" title="Cambiar Tema Claro / Oscuro">
             <span id="theme-icon-container"></span>
           </button>
 
+          <!-- Botón Cerrar Sesión / Cambiar Cuenta (Específico para Móvil) -->
+          <button onclick="cerrarSesion()" class="md:hidden p-2 glass-card rounded-xl text-sub hover:text-rose-500 transition flex items-center justify-center" title="Cerrar Sesión / Cambiar Cuenta">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </button>
+
           <!-- Botón Exportar CSV -->
-          <button id="btn-exportar" class="p-2 glass-card rounded-xl text-sub hover:text-main transition flex items-center justify-center text-xs font-semibold px-3 gap-1.5" title="Exportar CSV">
+          <button id="btn-exportar" class="p-2 glass-card rounded-xl text-sub hover:text-main transition flex items-center justify-center text-xs font-semibold px-2.5 sm:px-3 gap-1.5" title="Exportar CSV">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
             <span class="hidden sm:inline">CSV</span>
           </button>
 
-          <!-- Botón Cerrar Sesión (Móvil) -->
-          <button onclick="cerrarSesion()" class="md:hidden p-2 glass-card rounded-xl text-sub hover:text-rose-500 transition flex items-center justify-center" title="Cerrar Sesión">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-          </button>
-
           <!-- BOTÓN + NUEVO CON MENÚ DESPLEGABLE FLOTANTE -->
           <div class="relative">
-            <button id="btn-nuevo-toggle" onclick="toggleDropdownNuevo(event)" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-lg shadow-blue-600/25 flex items-center gap-1.5">
+            <button id="btn-nuevo-toggle" onclick="toggleDropdownNuevo(event)" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-3 sm:px-4 py-2 rounded-xl transition shadow-lg shadow-blue-600/25 flex items-center gap-1.5">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
               <span>+ Nuevo</span>
             </button>
@@ -331,19 +332,17 @@
       </header>
 
       <!-- ================= VISTA 1: PANEL ================= -->
-      <section id="vista-panel" class="p-6 space-y-6">
+      <section id="vista-panel" class="p-4 sm:p-6 space-y-6">
 
-        <!-- BARRA DE FILTROS SUPERIORES: TIEMPO (Todo, 12M, 90D, 30D, y Selector Completo de Año, Mes y Día Personalizado) -->
+        <!-- BARRA DE FILTROS SUPERIORES: TIEMPO -->
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           
-          <!-- Filtros de Tiempo con Selector Completo de Calendario Personalizado (Año, Mes, Día) en Cápsula Unificada -->
           <div class="flex items-center gap-1 p-1 rounded-xl border text-xs font-semibold overflow-x-auto no-scrollbar" style="background-color: var(--bg-input); border-color: var(--border-color);">
             <button onclick="cambiarFiltroTiempo('todo')" id="tf-todo" class="px-3.5 py-1.5 rounded-lg bg-blue-600 text-white transition shadow-sm">Todo</button>
             <button onclick="cambiarFiltroTiempo('12m')" id="tf-12m" class="px-3 py-1.5 rounded-lg text-sub hover:text-main transition">12M</button>
             <button onclick="cambiarFiltroTiempo('90d')" id="tf-90d" class="px-3 py-1.5 rounded-lg text-sub hover:text-main transition">90D</button>
             <button onclick="cambiarFiltroTiempo('30d')" id="tf-30d" class="px-3 py-1.5 rounded-lg text-sub hover:text-main transition">30D</button>
             
-            <!-- Selector Personalizado con Calendario Completo (Año, Mes y Día) -->
             <div id="tf-fecha-container" class="relative flex items-center px-3 py-1.5 rounded-lg text-sub hover:text-main cursor-pointer transition select-none">
               <div class="flex items-center gap-1.5 pointer-events-none">
                 <svg class="w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -355,22 +354,21 @@
             </div>
           </div>
 
-          <!-- Filtro de Empresa Rápido (Pills: Todas, Lucid, Apex, etc.) -->
           <div id="firma-pills-container" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
             <button onclick="seleccionarFiltroEmpresa('todas')" id="p-pill-todas" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white transition shadow-sm">Todas</button>
           </div>
 
         </div>
 
-        <!-- Fila Superior de Métricas (Dashboard de 4 Tarjetas Sencillas, Claras y Precisas) -->
+        <!-- Fila Superior de Métricas -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
-          <!-- Tarjeta 1: Payouts Cobrados en Total (Sin Gráficas, Información Directa) -->
+          <!-- Tarjeta 1: Payouts Cobrados -->
           <div class="glass-card p-6 rounded-2xl flex flex-col justify-between space-y-3">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-sub uppercase tracking-wider flex items-center gap-1.5">
                 <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Payouts cobrados
+                <span id="titulo-tarjeta-payouts">Payouts cobrados</span>
               </span>
               <div class="flex rounded-lg p-0.5 border text-[10px] font-bold" style="background-color: var(--bg-input); border-color: var(--border-color);">
                 <button onclick="cambiarModoBrutoNeto('bruto')" id="btn-bn-bruto-main" class="px-2 py-0.5 rounded text-sub hover:text-main transition">Bruto</button>
@@ -384,17 +382,17 @@
             </div>
 
             <div class="pt-2 border-t flex items-center justify-between text-xs" style="border-color: var(--border-color);">
-              <span class="text-sub">Total cobros:</span>
+              <span id="label-payouts-count" class="text-sub">Total cobros:</span>
               <span id="badge-payouts-count-label" class="font-bold text-emerald-500 font-mono">0 retiros</span>
             </div>
           </div>
 
-          <!-- Tarjeta: Beneficio Neto -->
+          <!-- Tarjeta 2: Beneficio Neto -->
           <div class="glass-card p-6 rounded-2xl flex flex-col justify-between space-y-3">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-sub uppercase tracking-wider flex items-center gap-1">
                 <svg class="w-3.5 h-3.5 text-sub" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                Beneficio neto
+                <span id="titulo-tarjeta-beneficio">Beneficio neto</span>
               </span>
               <div class="flex rounded-lg p-0.5 border text-[10px] font-bold" style="background-color: var(--bg-input); border-color: var(--border-color);">
                 <button onclick="cambiarModoBrutoNeto('bruto')" id="btn-bn-bruto-sub" class="px-2 py-0.5 rounded text-sub hover:text-main transition">Bruto</button>
@@ -406,19 +404,18 @@
               <div id="kpi-panel-neto" class="text-3xl font-black font-mono privacy-blur text-rose-500">$0.00</div>
               <div class="flex items-center gap-2 mt-1">
                 <span id="kpi-panel-roi" class="text-xs font-bold text-rose-500">↓ 0.0% ROI</span>
-                <span class="text-[10px] text-sub">cobrado - invertido</span>
+                <span id="kpi-panel-roi-sub" class="text-[10px] text-sub">cobrado - invertido</span>
               </div>
             </div>
 
             <div class="pt-2 border-t flex items-center justify-between text-xs" style="border-color: var(--border-color);">
-              <span class="text-sub">Cobrado acumulado:</span>
+              <span id="label-cobrado-resumen" class="text-sub">Cobrado acumulado:</span>
               <span id="kpi-panel-cobrado-resumen" class="font-bold text-emerald-500 privacy-blur">$0.00</span>
             </div>
           </div>
 
-          <!-- Columna Derecha: Invertido en Cuentas + Funding Ratio -->
+          <!-- Columna: Invertido + Ratio -->
           <div class="flex flex-col gap-4">
-            
             <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-2">
               <span class="text-[11px] font-bold text-sub uppercase tracking-wider flex items-center gap-1.5">
                 <svg class="w-3.5 h-3.5 text-sub" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
@@ -444,13 +441,12 @@
                 <p id="kpi-funding-desc" class="text-[10px] text-sub mt-0.5 truncate">0 de 0 evaluaciones decididas</p>
               </div>
             </div>
-
           </div>
 
         </div>
 
         <!-- SECCIÓN CALENDARIO -->
-        <div class="glass-card p-6 rounded-2xl space-y-5">
+        <div class="glass-card p-4 sm:p-6 rounded-2xl space-y-5">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h3 class="text-base font-extrabold text-main">Calendario</h3>
@@ -495,7 +491,7 @@
                 <div>S-D</div>
                 <div class="text-blue-500">SEMANA</div>
               </div>
-              <div id="cal-dias-grid" class="grid grid-cols-7 gap-2"></div>
+              <div id="cal-dias-grid" class="grid grid-cols-7 gap-1.5 sm:gap-2"></div>
             </div>
 
             <div class="glass-card p-4 rounded-xl space-y-3">
@@ -516,14 +512,14 @@
         </div>
 
         <!-- SECCIÓN: POR EMPRESA -->
-        <div class="glass-card p-6 rounded-2xl space-y-4">
+        <div class="glass-card p-4 sm:p-6 rounded-2xl space-y-4">
           <div>
             <h3 class="text-base font-extrabold text-main">Por empresa</h3>
             <p class="text-xs text-sub mt-0.5">Beneficio neto = cobrado - invertido</p>
           </div>
 
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
+            <table class="w-full text-left text-xs min-w-[500px]">
               <thead class="text-sub uppercase text-[10px] font-bold border-b" style="border-color: var(--border-color);">
                 <tr>
                   <th class="py-3 px-3">Empresa</th>
@@ -543,19 +539,19 @@
       </section>
 
       <!-- ================= VISTA: ESTRATEGIA ================= -->
-      <section id="vista-estrategia" class="p-6 space-y-6 hidden">
-        <div class="glass-card p-8 rounded-2xl text-center space-y-2 relative overflow-hidden">
+      <section id="vista-estrategia" class="p-4 sm:p-6 space-y-6 hidden">
+        <div class="glass-card p-6 sm:p-8 rounded-2xl text-center space-y-2 relative overflow-hidden">
           <div class="text-[10px] font-bold uppercase tracking-wider text-blue-500">
             FORWARD TESTING EN CUENTAS REALES • REGLAS FIJAS, CERO DISCRECIONALIDAD
           </div>
-          <div id="st-big-approval-rate" class="text-6xl sm:text-7xl font-black font-mono text-main tracking-tight">
+          <div id="st-big-approval-rate" class="text-5xl sm:text-7xl font-black font-mono text-main tracking-tight">
             43%
           </div>
           <div class="text-sm font-bold text-sub">
             de tus evaluaciones se aprueban
           </div>
           <p id="st-approval-detail" class="text-xs text-sub max-w-lg mx-auto pt-1">
-            Con las señales reales: <strong class="text-main" id="st-detail-counts">0 de 0</strong> cuentas de evaluación simuladas aprobadas. Cada operación, ganada o perdida, está apuntada.
+            Con las señales reales: <strong class="text-main" id="st-detail-counts">0 de 0</strong> cuentas de evaluación simuladas aprobadas.
           </p>
         </div>
 
@@ -598,10 +594,10 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div class="glass-card p-6 rounded-2xl space-y-3">
+          <div class="glass-card p-4 sm:p-6 rounded-2xl space-y-3">
             <div>
               <h3 class="text-sm font-bold text-main">Resultado acumulado</h3>
-              <p class="text-xs text-sub">Suma de todas las operaciones apuntadas con su curva de equidad</p>
+              <p class="text-xs text-sub">Suma de todas las operaciones con curva de equidad</p>
             </div>
             <div class="w-full h-56 glass-input rounded-xl p-3 relative flex flex-col justify-end">
               <svg id="svg-strat-curve" class="w-full h-full" viewBox="0 0 500 150" preserveAspectRatio="none">
@@ -617,10 +613,10 @@
             </div>
           </div>
 
-          <div class="glass-card p-6 rounded-2xl space-y-3">
+          <div class="glass-card p-4 sm:p-6 rounded-2xl space-y-3">
             <div>
               <h3 class="text-sm font-bold text-main">Resultado por semana</h3>
-              <p class="text-xs text-sub">Semanas en verde y semanas en rojo, sin maquillar</p>
+              <p class="text-xs text-sub">Semanas en verde y semanas en rojo</p>
             </div>
             <div class="w-full h-56 glass-input rounded-xl p-3 relative flex flex-col justify-end">
               <svg id="svg-strat-bars" class="w-full h-full" viewBox="0 0 500 150">
@@ -633,7 +629,7 @@
       </section>
 
       <!-- ================= VISTA 2: GESTIÓN DE CUENTAS ================= -->
-      <section id="vista-cuentas" class="p-6 space-y-6 hidden">
+      <section id="vista-cuentas" class="p-4 sm:p-6 space-y-6 hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 class="text-xl font-black text-main">Gestión de Cuentas Activas</h2>
@@ -655,8 +651,8 @@
         <div id="grid-tarjetas-cuentas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       </section>
 
-      <!-- ================= VISTA 3: PAYOUTS (Módulo dedicado) ================= -->
-      <section id="vista-payouts" class="p-6 space-y-6 hidden">
+      <!-- ================= VISTA 3: PAYOUTS ================= -->
+      <section id="vista-payouts" class="p-4 sm:p-6 space-y-6 hidden">
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-xl font-black text-main">Historial y Control de Payouts</h2>
@@ -670,7 +666,7 @@
 
         <div class="glass-card rounded-2xl overflow-hidden">
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
+            <table class="w-full text-left text-xs min-w-[500px]">
               <thead class="text-sub uppercase text-[10px] font-bold border-b" style="border-color: var(--border-color); background-color: var(--bg-input);">
                 <tr>
                   <th class="p-4">Fecha</th>
@@ -688,10 +684,10 @@
       </section>
 
       <!-- ================= VISTA 4: ANALÍTICA ================= -->
-      <section id="vista-analitica" class="p-6 space-y-6 hidden">
+      <section id="vista-analitica" class="p-4 sm:p-6 space-y-6 hidden">
         <div>
           <h2 class="text-xl font-black text-main">Analítica Financiera Global</h2>
-          <p class="text-xs text-sub">Ratios de eficiencia, rentabilidad y salud operativa de tu trading de fondeo</p>
+          <p class="text-xs text-sub">Ratios de eficiencia, rentabilidad y salud operativa</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -715,12 +711,12 @@
         </div>
       </section>
 
-      <!-- ================= VISTA 5: JOURNAL (Renombrado solo a Journal) ================= -->
-      <section id="vista-journal" class="p-6 space-y-6 hidden">
+      <!-- ================= VISTA 5: JOURNAL ================= -->
+      <section id="vista-journal" class="p-4 sm:p-6 space-y-6 hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 class="text-xl font-black text-main">Journal</h2>
-            <p class="text-xs text-sub">Bitácora táctica con control psicológico y curva de equidad en tiempo real</p>
+            <p class="text-xs text-sub">Bitácora táctica con control psicológico y curva de equidad</p>
           </div>
           <button onclick="toggleFormJournal()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-lg shadow-blue-600/25 flex items-center gap-1.5 self-start sm:self-auto">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
@@ -754,7 +750,7 @@
           </div>
         </div>
 
-        <div class="glass-card p-6 rounded-2xl space-y-3">
+        <div class="glass-card p-4 sm:p-6 rounded-2xl space-y-3">
           <div class="flex justify-between items-center">
             <h3 class="text-sm font-bold text-main">Curva de Equidad Acumulada</h3>
             <span id="j-badge-estado" class="text-xs px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/25 font-bold">Sin datos</span>
@@ -773,7 +769,7 @@
           </div>
         </div>
 
-        <div id="panel-form-journal" class="glass-card p-6 rounded-2xl hidden space-y-4">
+        <div id="panel-form-journal" class="glass-card p-4 sm:p-6 rounded-2xl hidden space-y-4">
           <h3 class="text-sm font-bold text-main">Registrar Operación en Journal</h3>
           <form id="form-journal" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
@@ -831,7 +827,7 @@
 
         <div class="glass-card rounded-2xl overflow-hidden">
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
+            <table class="w-full text-left text-xs min-w-[500px]">
               <thead class="text-sub uppercase text-[10px] font-bold border-b" style="border-color: var(--border-color); background-color: var(--bg-input);">
                 <tr>
                   <th class="p-3.5">Fecha</th>
@@ -997,8 +993,8 @@
   </aside>
 
   <!-- MODAL: REGISTRAR PAYOUT -->
-  <div id="modal-payout" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 hidden">
-    <div class="glass-card w-full max-w-md p-6 rounded-2xl space-y-4 shadow-2xl">
+  <div id="modal-payout" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto hidden">
+    <div class="glass-card w-full max-w-md p-6 rounded-2xl space-y-4 shadow-2xl my-auto">
       <div class="flex justify-between items-center pb-2 border-b" style="border-color: var(--border-color);">
         <h3 class="text-base font-black text-main">Registrar Cobro / Payout</h3>
         <button onclick="cerrarModalPayout()" class="text-sub hover:text-main">✕</button>
@@ -1107,7 +1103,7 @@
     let journalList = [];
 
     // Filtros
-    let filtroTiempo = 'todo'; // 'todo', '12m', '90d', '30d', o fecha específica 'YYYY-MM-DD'
+    let filtroTiempo = 'todo';
     let filtroEmpresaActiva = 'todas';
     let modoBrutoNeto = 'neto';
 
@@ -1161,12 +1157,11 @@
 
     window.cambiarFiltroFechaPersonalizada = function(fechaVal) {
       if (!fechaVal) return;
-      filtroTiempo = fechaVal; // Filtra por día específico YYYY-MM-DD
+      filtroTiempo = fechaVal;
       ['todo', '12m', '90d', '30d'].forEach(f => {
         document.getElementById(`tf-${f}`).className = "px-3 py-1.5 rounded-lg text-sub hover:text-main transition";
       });
       
-      // Mostrar fecha formateada: ej. 18 nov 2026
       try {
         const partes = fechaVal.split('-');
         if (partes.length === 3) {
@@ -1233,21 +1228,25 @@
       });
     }
 
+    let modoBrutoNeto = localStorage.getItem('prop_modo_bruto_neto') || 'neto';
+
     window.cambiarModoBrutoNeto = function(modo) {
       modoBrutoNeto = modo;
+      localStorage.setItem('prop_modo_bruto_neto', modo);
       ['bruto', 'neto'].forEach(m => {
         const btnMain = document.getElementById(`btn-bn-${m}-main`);
         const btnSub = document.getElementById(`btn-bn-${m}-sub`);
         if (m === modo) {
-          if (btnMain) btnMain.className = "px-2 py-0.5 rounded bg-blue-600 text-white transition";
-          if (btnSub) btnSub.className = "px-2 py-0.5 rounded bg-blue-600 text-white transition";
+          if (btnMain) btnMain.className = "px-2 py-0.5 rounded bg-blue-600 text-white transition shadow-sm font-bold";
+          if (btnSub) btnSub.className = "px-2 py-0.5 rounded bg-blue-600 text-white transition shadow-sm font-bold";
         } else {
-          if (btnMain) btnMain.className = "px-2 py-0.5 rounded text-sub hover:text-main transition";
-          if (btnSub) btnSub.className = "px-2 py-0.5 rounded text-sub hover:text-main transition";
+          if (btnMain) btnMain.className = "px-2 py-0.5 rounded text-sub hover:text-main transition font-medium";
+          if (btnSub) btnSub.className = "px-2 py-0.5 rounded text-sub hover:text-main transition font-medium";
         }
       });
       actualizarTodo();
     };
+    cambiarModoBrutoNeto(modoBrutoNeto);
 
     window.toggleModoPrivacidad = function() {
       isPrivacyMode = !isPrivacyMode;
@@ -1312,17 +1311,19 @@
       if (mode === 'login') {
         tabL.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white transition";
         tabR.className = "flex-1 py-2 text-xs font-bold rounded-lg text-sub hover:text-main transition";
-        btnSub.textContent = "Entrar a mi Panel";
+        btnSub.innerHTML = `<span>Entrar a mi Panel</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
       } else {
         tabR.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white transition";
         tabL.className = "flex-1 py-2 text-xs font-bold rounded-lg text-sub hover:text-main transition";
-        btnSub.textContent = "Crear Cuenta Nueva";
+        btnSub.innerHTML = `<span>Crear Cuenta Nueva</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
       }
     };
 
     window.cerrarSesion = function() {
-      localStorage.removeItem('prop_logged_user');
-      window.location.reload();
+      if (confirm("¿Cerrar sesión y cambiar de cuenta?")) {
+        localStorage.removeItem('prop_logged_user');
+        window.location.reload();
+      }
     };
 
     if (!currentUser) {
@@ -1366,6 +1367,9 @@
     function iniciarSistema(usuarioId) {
       document.getElementById('app-container').classList.remove('hidden');
       document.getElementById('display-sidebar-user').textContent = usuarioId;
+      
+      const mobBadge = document.getElementById('mobile-user-badge');
+      if (mobBadge) mobBadge.textContent = usuarioId;
 
       const cuentasRef = ref(db, `usuarios/${usuarioId}/cuentas`);
       const registrosRef = ref(db, `usuarios/${usuarioId}/registros`);
@@ -1545,7 +1549,7 @@
         if (filtroTiempo === '90d') return diffDias <= 90;
         if (filtroTiempo === '12m') return diffDias <= 365;
         if (filtroTiempo.includes('-')) {
-          return r.fecha.startsWith(filtroTiempo); // Fecha exacta YYYY-MM-DD o mes YYYY-MM
+          return r.fecha.startsWith(filtroTiempo);
         }
         return true;
       });
@@ -1581,31 +1585,111 @@
         if (r.tipo === 'payout') totalPayouts += m;
       });
 
-      // Beneficio neto = Total Cobrado (Payouts) - Total Invertido (Gastos)
+      // Beneficio Neto real = Payouts - Invertido
       const pnlNeto = totalPayouts - totalInvertido;
       
-      // ROI = ((Beneficio Neto) / Total Invertido) * 100
-      let roi = 0;
+      // ROI Neto real = ((Payouts - Invertido) / Invertido) * 100
+      let roiNeto = 0;
       if (totalInvertido > 0) {
-        roi = (pnlNeto / totalInvertido) * 100;
+        roiNeto = (pnlNeto / totalInvertido) * 100;
       } else if (totalPayouts > 0) {
-        roi = 100.0;
+        roiNeto = 100.0;
       }
 
-      // 1. Tarjeta Payouts Cobrados
-      const kpiPayoutsMain = document.getElementById('kpi-panel-payouts-main');
-      if (kpiPayoutsMain) kpiPayoutsMain.textContent = formatearMoneda(totalPayouts);
+      // Retorno Bruto = (Payouts / Invertido) * 100
+      let retornoBruto = 0;
+      if (totalInvertido > 0) {
+        retornoBruto = (totalPayouts / totalInvertido) * 100;
+      } else if (totalPayouts > 0) {
+        retornoBruto = 100.0;
+      }
 
       const payoutsFiltradosCount = regs.filter(r => r.tipo === 'payout').length;
       const totalPayoutsGlobalCount = registrosList.filter(r => r.tipo === 'payout').length;
+
+      // Elementos del DOM
+      const tituloPayouts = document.getElementById('titulo-tarjeta-payouts');
+      const kpiPayoutsMain = document.getElementById('kpi-panel-payouts-main');
       const badgePayoutsSub = document.getElementById('badge-payouts-subtitle');
-      if (badgePayoutsSub) {
-        badgePayoutsSub.textContent = `${payoutsFiltradosCount} payouts · ${formatearMoneda(totalPayouts)} netos tras el reparto`;
-      }
+      const labelPayoutsCount = document.getElementById('label-payouts-count');
       const badgeCountLabel = document.getElementById('badge-payouts-count-label');
-      if (badgeCountLabel) {
-        badgeCountLabel.textContent = `${payoutsFiltradosCount} retiros`;
+
+      const tituloBeneficio = document.getElementById('titulo-tarjeta-beneficio');
+      const kpiNeto = document.getElementById('kpi-panel-neto');
+      const roiEl = document.getElementById('kpi-panel-roi');
+      const roiSubEl = document.getElementById('kpi-panel-roi-sub');
+      const labelCobradoResumen = document.getElementById('label-cobrado-resumen');
+      const cobradoResumen = document.getElementById('kpi-panel-cobrado-resumen');
+
+      if (modoBrutoNeto === 'bruto') {
+        // MODO BRUTO:
+        // Payouts cobrados: muestra el total en pagos sin descontar inversión
+        if (tituloPayouts) tituloPayouts.textContent = "Payouts (Bruto)";
+        if (kpiPayoutsMain) {
+          kpiPayoutsMain.textContent = formatearMoneda(totalPayouts);
+          kpiPayoutsMain.className = "text-3xl sm:text-4xl font-black text-emerald-500 font-mono privacy-blur";
+        }
+        if (badgePayoutsSub) {
+          badgePayoutsSub.textContent = `${payoutsFiltradosCount} retiros · ${formatearMoneda(totalPayouts)} brutos recibidos`;
+        }
+        if (labelPayoutsCount) labelPayoutsCount.textContent = "Total retiros:";
+        if (badgeCountLabel) {
+          badgeCountLabel.textContent = `${payoutsFiltradosCount} cobros`;
+          badgeCountLabel.className = "font-bold text-emerald-500 font-mono";
+        }
+
+        // Beneficio / Rendimiento Bruto: total en pagos sin descontar inversión
+        if (tituloBeneficio) tituloBeneficio.textContent = "Total cobrado (Bruto)";
+        if (kpiNeto) {
+          kpiNeto.textContent = formatearMoneda(totalPayouts);
+          kpiNeto.className = "text-3xl font-black font-mono privacy-blur text-emerald-500";
+        }
+        if (roiEl) {
+          roiEl.textContent = `↑ ${retornoBruto.toFixed(1)}% Retorno`;
+          roiEl.className = "text-xs font-bold text-emerald-500";
+        }
+        if (roiSubEl) roiSubEl.textContent = "sin descontar inversión";
+        if (labelCobradoResumen) labelCobradoResumen.textContent = "Invertido en cuentas:";
+        if (cobradoResumen) {
+          cobradoResumen.textContent = formatearMoneda(totalInvertido);
+          cobradoResumen.className = "font-bold text-main font-mono privacy-blur";
+        }
+      } else {
+        // MODO NETO:
+        // Calcula cuánto se invirtió vs cuánto se generó en payouts para saber el ROI real y beneficio neto
+        if (tituloPayouts) tituloPayouts.textContent = "Payouts (Neto)";
+        if (kpiPayoutsMain) {
+          kpiPayoutsMain.textContent = formatearMoneda(totalPayouts);
+          kpiPayoutsMain.className = "text-3xl sm:text-4xl font-black text-emerald-500 font-mono privacy-blur";
+        }
+        if (badgePayoutsSub) {
+          badgePayoutsSub.textContent = `${payoutsFiltradosCount} retiros · Balance neto: ${formatearMoneda(pnlNeto, true)}`;
+        }
+        if (labelPayoutsCount) labelPayoutsCount.textContent = "Neto tras inversión:";
+        if (badgeCountLabel) {
+          badgeCountLabel.textContent = formatearMoneda(pnlNeto, true);
+          badgeCountLabel.className = `font-bold font-mono ${pnlNeto >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+        }
+
+        // Beneficio Neto real: Payouts - Invertido
+        if (tituloBeneficio) tituloBeneficio.textContent = "Beneficio neto real";
+        if (kpiNeto) {
+          kpiNeto.textContent = formatearMoneda(pnlNeto, true);
+          kpiNeto.className = `text-3xl font-black font-mono privacy-blur ${pnlNeto >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+        }
+        if (roiEl) {
+          const roiSigno = roiNeto >= 0 ? '↑ +' : '↓ ';
+          roiEl.textContent = `${roiSigno}${Math.abs(roiNeto).toFixed(1)}% ROI`;
+          roiEl.className = `text-xs font-bold ${pnlNeto >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+        }
+        if (roiSubEl) roiSubEl.textContent = "payouts vs inversión";
+        if (labelCobradoResumen) labelCobradoResumen.textContent = "Cobrado acumulado:";
+        if (cobradoResumen) {
+          cobradoResumen.textContent = formatearMoneda(totalPayouts);
+          cobradoResumen.className = "font-bold text-emerald-500 font-mono privacy-blur";
+        }
       }
+
       const badgeSidePayouts = document.getElementById('badge-payouts-count');
       if (badgeSidePayouts) badgeSidePayouts.textContent = totalPayoutsGlobalCount;
       const mobBadgePayouts = document.getElementById('mob-badge-payouts');
@@ -1614,24 +1698,6 @@
         else mobBadgePayouts.classList.add('hidden');
       }
 
-      // 2. Tarjeta Beneficio Neto
-      const kpiNeto = document.getElementById('kpi-panel-neto');
-      if (kpiNeto) {
-        kpiNeto.textContent = formatearMoneda(pnlNeto, true);
-        kpiNeto.className = `text-3xl font-black font-mono privacy-blur ${pnlNeto >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
-      }
-
-      const roiEl = document.getElementById('kpi-panel-roi');
-      if (roiEl) {
-        const roiSigno = roi >= 0 ? '↑ +' : '↓ ';
-        roiEl.textContent = `${roiSigno}${Math.abs(roi).toFixed(1)}% ROI`;
-        roiEl.className = `text-xs font-bold ${pnlNeto >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
-      }
-
-      const cobradoResumen = document.getElementById('kpi-panel-cobrado-resumen');
-      if (cobradoResumen) cobradoResumen.textContent = formatearMoneda(totalPayouts);
-
-      // 3. Tarjeta Invertido en cuentas
       const kpiInvertido = document.getElementById('kpi-panel-invertido');
       if (kpiInvertido) kpiInvertido.textContent = formatearMoneda(totalInvertido);
 
@@ -1653,7 +1719,6 @@
         else mobBadgeCuentas.classList.add('hidden');
       }
 
-      // 4. Funding Ratio
       const decididas = cuentas.filter(c => c.estado === 'Quemada' || c.estado === 'Fondeada Sim' || c.estado === 'Fondeada Live').length;
       const aprobadas = cuentas.filter(c => c.estado === 'Fondeada Sim' || c.estado === 'Fondeada Live').length;
       const enCurso = cuentas.filter(c => c.estado === 'Evaluación').length;
@@ -1682,7 +1747,6 @@
       renderizarTarjetasCuentas();
       renderizarTablaPayouts();
 
-      // Analítica
       const ratioEf = totalInvertido > 0 ? (totalPayouts / totalInvertido).toFixed(2) : (totalPayouts > 0 ? '∞' : '0.00');
       const anRatio = document.getElementById('an-ratio-eficiencia');
       if (anRatio) anRatio.textContent = `${ratioEf}x`;
@@ -1753,7 +1817,6 @@
         if (stUlt) stUlt.textContent = `${ganadas20} ganadas (${ultimos20.length} registrados)`;
       }
 
-      // Curva de equidad real
       const sLine = document.getElementById('svg-strat-line');
       const sArea = document.getElementById('svg-strat-area');
       if (sLine && sArea) {
@@ -2005,7 +2068,6 @@
 
       const empresasMap = {};
 
-      // 1. Gastos e Ingresos reales consolidados desde registros
       registrosList.forEach(r => {
         const emp = (r.firma || 'Otra').trim();
         if (!empresasMap[emp]) empresasMap[emp] = { nombre: emp, cuentas: 0, activas: 0, quemadas: 0, invertido: 0, cobrado: 0 };
@@ -2014,7 +2076,6 @@
         if (r.tipo === 'payout') empresasMap[emp].cobrado += m;
       });
 
-      // 2. Conteo de cuentas
       cuentasList.forEach(c => {
         const emp = (c.empresa || 'Otra').trim();
         if (!empresasMap[emp]) empresasMap[emp] = { nombre: emp, cuentas: 0, activas: 0, quemadas: 0, invertido: 0, cobrado: 0 };
